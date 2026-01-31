@@ -18,46 +18,65 @@ using pFuncParse = bool(*)(const char*key,const std::string &json,void*pThis,voi
 using ReflectMapType = std::unordered_map<const char*,std::pair<OffsetType,pFuncParse>>;
 
 template <typename  T>
-bool transform_from_json(const char*key,const std::string &json,void*pThis,T * offset);
+struct transform;
+
+
+//bool transform_from_json(const char*key,const std::string &json,void*pThis,T * offset);
+
+template <>
+struct transform<bool>
+{
+    static  bool from_json(const char*key,const std::string &json,void*pThis,bool * offset)
+    {
+        auto && dest = *reinterpret_cast<bool*>(static_cast<char*>(pThis) + reinterpret_cast<OffsetType>(offset));
+        dest = true;
+        //int *pDest = (int*)(((char*)pThis) + offset);
+        std::cout << key << "--bool-" << json << "---"  << pThis  << "--"  << offset   << std::endl;
+        return true;
+    }
+};
+
+template <>
+struct transform<int>
+{
+    static  bool from_json(const char*key,const std::string &json,void*pThis,int * offset)
+    {
+        auto && dest = *reinterpret_cast<int*>(static_cast<char*>(pThis) + reinterpret_cast<OffsetType>(offset));
+        dest = 1;
+        //int *pDest = (int*)(((char*)pThis) + offset);
+        std::cout << key << "--int-" << json << "---"  << pThis  << "--"  << offset   << std::endl;
+        return true;
+    }
+};
 
 
 template <>
-bool transform_from_json<bool>(const char*key,const std::string &json,void*pThis,bool * offset)
+struct transform<double>
 {
-    auto && dest = *reinterpret_cast<bool*>(static_cast<char*>(pThis) + reinterpret_cast<OffsetType>(offset));
-    dest = true;
-    //int *pDest = (int*)(((char*)pThis) + offset);
-    std::cout << key << "--bool-" << json << "---"  << pThis  << "--"  << offset   << std::endl;
-    return true;
-}
+  
+    static  bool from_json(const char*key,const std::string &json,void*pThis,double * offset)
+    {
+        auto && dest = *reinterpret_cast<double*>(static_cast<char*>(pThis) + reinterpret_cast<OffsetType>(offset));
+        dest = 9.9;
+        std::cout << key << "--double-" << json << "---"  << pThis  << "--"  << offset   << std::endl;
+        return true;
+    }
+};
+
 
 template <>
-bool transform_from_json<int>(const char*key,const std::string &json,void*pThis,int * offset)
+struct transform<std::string>
 {
-    auto && dest = *reinterpret_cast<int*>(static_cast<char*>(pThis) + reinterpret_cast<OffsetType>(offset));
-    dest = 1;
-    //int *pDest = (int*)(((char*)pThis) + offset);
-    std::cout << key << "--int-" << json << "---"  << pThis  << "--"  << offset   << std::endl;
-    return true;
-}
+    static  bool from_json(const char*key,const std::string &json,void*pThis,std::string * offset)
+    {
+        auto && dest = *reinterpret_cast<std::string*>(static_cast<char*>(pThis) + reinterpret_cast<OffsetType>(offset));
+        dest = "9099009llkk";
+        std::cout << key << "-string--" << json << "---"  << pThis  << "--"  << offset   << std::endl;
+        return true;
+    }
+};
 
-template <>
-bool transform_from_json<double>(const char*key,const std::string &json,void*pThis,double * offset)
-{
-    auto && dest = *reinterpret_cast<double*>(static_cast<char*>(pThis) + reinterpret_cast<OffsetType>(offset));
-    dest = 9.9;
-    std::cout << key << "--double-" << json << "---"  << pThis  << "--"  << offset   << std::endl;
-    return true;
-}
 
-template <>
-bool transform_from_json<std::string>(const char*key,const std::string &json,void*pThis,std::string * offset)
-{
-    auto && dest = *reinterpret_cast<std::string*>(static_cast<char*>(pThis) + reinterpret_cast<OffsetType>(offset));
-    dest = "9099009llkk";
-    std::cout << key << "-string--" << json << "---"  << pThis  << "--"  << offset   << std::endl;
-    return true;
-}
 
 bool transform_from_json(void *pThis,const auto_json::ReflectMapType &reflect_map ,const std::string&json)
 {
@@ -86,9 +105,9 @@ struct JOSONODEL {
 };
 
 const  auto_json::ReflectMapType JOSONODEL::reflect_map = {
-    {TO_STRING(a),{offsetof(JOSONODEL, a),(auto_json::pFuncParse)auto_json::transform_from_json<int>}},
-    {TO_STRING(b),{offsetof(JOSONODEL, b),(auto_json::pFuncParse)auto_json::transform_from_json<double>}},
-    {TO_STRING(cc),{offsetof(JOSONODEL, cc),(auto_json::pFuncParse)auto_json::transform_from_json<std::string>}},
+    {TO_STRING(a),{offsetof(JOSONODEL, a),(auto_json::pFuncParse)auto_json::transform<int>::from_json}},
+    {TO_STRING(b),{offsetof(JOSONODEL, b),(auto_json::pFuncParse)auto_json::transform<double>::from_json}},
+    {TO_STRING(cc),{offsetof(JOSONODEL, cc),(auto_json::pFuncParse)auto_json::transform<std::string>::from_json}},
 };
 
 int main(int argc, const char * argv[]) {
