@@ -33,6 +33,8 @@ bool transfom_from_json<int>(const char*key,const std::string &json,void*pThis,i
 template <>
 bool transfom_from_json<double>(const char*key,const std::string &json,void*pThis,double * offset)
 {
+    auto && dest = *reinterpret_cast<double*>(static_cast<char*>(pThis) + reinterpret_cast<OffsetType>(offset));
+    dest = 9.9;
     std::cout << key << "--double-" << json << "---"  << pThis  << "--"  << offset   << std::endl;
     return true;
 }
@@ -40,6 +42,8 @@ bool transfom_from_json<double>(const char*key,const std::string &json,void*pThi
 template <>
 bool transfom_from_json<std::string>(const char*key,const std::string &json,void*pThis,std::string * offset)
 {
+    auto && dest = *reinterpret_cast<std::string*>(static_cast<char*>(pThis) + reinterpret_cast<OffsetType>(offset));
+    dest = "9099009llkk";
     std::cout << key << "-string--" << json << "---"  << pThis  << "--"  << offset   << std::endl;
     return true;
 }
