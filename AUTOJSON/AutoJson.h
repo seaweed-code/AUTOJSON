@@ -15,13 +15,6 @@
 #include <vector>
 
 
-
-#define __ADD__JSON__KEY__1(C,_1)  {#_1,{offsetof(C, _1),(auto_json::pFuncParse)auto_json::transform<decltype(C::_1)>::from_json}},
-#define __ADD__JSON__KEY__2(C,_1,_2)      __ADD__JSON__KEY__1(C,_1) __ADD__JSON__KEY__1(C,_2)
-#define __ADD__JSON__KEY__3(C,_1,_2,_3)   __ADD__JSON__KEY__2(C,_1,_2) __ADD__JSON__KEY__1(C,_3)
-#define __ADD__JSON__KEY__4(C,_1,_2,_3,_4)   __ADD__JSON__KEY__3(C,_1,_2,_3) __ADD__JSON__KEY__1(C,_4)
-
-
 namespace auto_json {
 
 using OffsetType = size_t;
@@ -117,6 +110,14 @@ bool transform_from_json(void *pThis,const auto_json::ReflectMapType &reflect_ma
 
 };
 
+
+#define __ADD__JSON__KEY__1(C,_1)  {#_1,{offsetof(C, _1),(auto_json::pFuncParse)auto_json::transform<decltype(C::_1)>::from_json}},
+#define __ADD__JSON__KEY__2(C,_1,_2)      __ADD__JSON__KEY__1(C,_1) __ADD__JSON__KEY__1(C,_2)
+#define __ADD__JSON__KEY__3(C,_1,_2,_3)   __ADD__JSON__KEY__2(C,_1,_2) __ADD__JSON__KEY__1(C,_3)
+#define __ADD__JSON__KEY__4(C,_1,_2,_3,_4)   __ADD__JSON__KEY__3(C,_1,_2,_3) __ADD__JSON__KEY__1(C,_4)
+
+
+
 #define DECLARE__JSON__AUTO__TRANSFORM  \
 const static auto_json::ReflectMapType reflect_map;  \
 inline bool transform_from_json(const std::string &json){return auto_json::transform_from_json(this, reflect_map, json);}
@@ -146,7 +147,6 @@ inline bool transform_from_json(const std::string &json){return auto_json::trans
 const  auto_json::ReflectMapType C::reflect_map = {\
     __CONCATFUNCTION__(__VA_ARGS__)(C,__VA_ARGS__)  \
 };
-
 
 
 
