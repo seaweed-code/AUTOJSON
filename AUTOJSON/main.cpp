@@ -8,7 +8,7 @@
 #include <iostream>
 #include <unordered_map>
 #include <vector>
-#define TO_STRING(x) #x
+
 
 namespace auto_json {
 
@@ -111,8 +111,11 @@ inline bool transform_from_json(const std::string &json){return auto_json::trans
 
 
 #define ___JSON___PROPERTY___(MODEL,KEY)   \
-{TO_STRING(KEY),{offsetof(MODEL, KEY),(auto_json::pFuncParse)auto_json::transform<decltype(MODEL::KEY)>::from_json}},
+{#KEY,{offsetof(MODEL, KEY),(auto_json::pFuncParse)auto_json::transform<decltype(MODEL::KEY)>::from_json}},
 
+
+
+#define IMPLEMENT__JSON__AUTO__TRANSFORM(MODEL,...)
 
 struct JOSONODEL {
     int a{};
@@ -123,6 +126,8 @@ struct JOSONODEL {
     
     DECLARE__JSON__AUTO__TRANSFORM;
 };
+
+//IMPLEMENT__JSON__AUTO__TRANSFORM(JOSONODEL,a,b,cc,ddddddd);
 
 const  auto_json::ReflectMapType JOSONODEL::reflect_map = {
     ___JSON___PROPERTY___(JOSONODEL,a)
