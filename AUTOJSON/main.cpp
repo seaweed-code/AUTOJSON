@@ -7,7 +7,7 @@
 
 #include <iostream>
 #include <unordered_map>
-
+#include <vector>
 #define TO_STRING(x) #x
 
 namespace auto_json {
@@ -55,7 +55,8 @@ struct JOSONODEL {
     int a{};
     double b{};
     std::string cc;
-  
+
+    std::vector<int> dd;
 
     const static std::unordered_map<const char*,std::pair<auto_json::OffsetType, auto_json::pFuncParse>> reflect_map;
     JOSONODEL(const std::string &json){
