@@ -48,6 +48,17 @@ bool transfom_from_json<std::string>(const char*key,const std::string &json,void
     return true;
 }
 
+bool transform_to_model(void *pThis,const auto_json::ReflectMapType &reflect_map ,const std::string&json)
+{
+    for (auto&& p:reflect_map)
+    {
+       auto success =  p.second.second(p.first,json,pThis,reinterpret_cast<void*>(p.second.first));
+        if (!success)
+        {
+        }
+    }
+    return  true;
+}
 
 };
 
@@ -59,19 +70,11 @@ struct JOSONODEL {
     std::vector<int> dd;
 
     const static auto_json::ReflectMapType reflect_map;
-    JOSONODEL(const std::string &json){
-        for (auto&& p:reflect_map)
-        {
-           auto success =  p.second.second(p.first,json,this,reinterpret_cast<void*>(p.second.first));
-            if (!success)
-            {
-            }
-        }
-    }
+    JOSONODEL(const std::string &json){auto_json::transform_to_model(this, reflect_map, json);}
     
 };
 
-const  std::unordered_map<const char*,std::pair<auto_json::OffsetType, auto_json::pFuncParse>> JOSONODEL::reflect_map = {
+const  auto_json::ReflectMapType JOSONODEL::reflect_map = {
     {TO_STRING(a),{offsetof(JOSONODEL, a),(auto_json::pFuncParse)auto_json::transfom_from_json<int>}},
     {TO_STRING(b),{offsetof(JOSONODEL, b),(auto_json::pFuncParse)auto_json::transfom_from_json<double>}},
     {TO_STRING(cc),{offsetof(JOSONODEL, cc),(auto_json::pFuncParse)auto_json::transfom_from_json<std::string >}},
