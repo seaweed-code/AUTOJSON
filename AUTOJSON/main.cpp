@@ -23,9 +23,10 @@ struct transform;
 template <typename  T>
 struct transform<std::vector<T>>
 {
-    static  bool from_json(const char*key,const std::string &json,void*pThis,std::vector<T> * offset)
+    using Type = std::vector<T>;
+    static  bool from_json(const char*key,const std::string &json,void*pThis,Type * offset)
     {
-        auto && dest = *reinterpret_cast<std::vector<T>*>(static_cast<char*>(pThis) + reinterpret_cast<OffsetType>(offset));
+        auto && dest = *reinterpret_cast<Type*>(static_cast<char*>(pThis) + reinterpret_cast<OffsetType>(offset));
        // dest = true;
         //int *pDest = (int*)(((char*)pThis) + offset);
         std::cout << key << "--bool-" << json << "---"  << pThis  << "--"  << offset   << std::endl;
