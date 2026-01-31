@@ -22,7 +22,11 @@ using ReflectMapType = std::unordered_map<const char*,std::pair<OffsetType,pFunc
 template <typename  T,typename Enable = void>
 struct transform;
 
+template<typename T, typename = void>
+struct HasReflectType : std::false_type {};
 
+template<typename T>
+struct HasReflectType<T, std::void_t<decltype(T::reflect_map)>>: std::true_type {};
 
 template <typename  T>
 struct transform<std::vector<T>>
