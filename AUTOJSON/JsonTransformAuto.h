@@ -10,7 +10,7 @@
 #include <iostream>
 #include <unordered_map>
 #include <vector>
-
+#include <type_traits>
 
 namespace auto_json {
 
@@ -19,8 +19,10 @@ using pFuncParse = bool(*)(const char*key,const std::string &json,void*pThis,Off
 
 using ReflectMapType = std::unordered_map<const char*,std::pair<OffsetType,pFuncParse>>;
 
-template <typename  T>
+template <typename  T,typename Enable = void>
 struct transform;
+
+
 
 template <typename  T>
 struct transform<std::vector<T>>
