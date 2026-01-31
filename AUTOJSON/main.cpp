@@ -27,8 +27,11 @@ struct transform<std::vector<T>>
     static  bool from_json(const char*key,const std::string &json,void*pThis,Type * offset)
     {
         auto && dest = *reinterpret_cast<Type*>(static_cast<char*>(pThis) + reinterpret_cast<OffsetType>(offset));
-       // dest = true;
-        //int *pDest = (int*)(((char*)pThis) + offset);
+       
+        for (int i=0; i<4; i++) {
+            dest.push_back(T{});
+        }
+        
         std::cout << key << "--bool-" << json << "---"  << pThis  << "--"  << offset   << std::endl;
         return true;
     }
