@@ -24,9 +24,9 @@ template <typename  T>
 struct transform<std::vector<T>>
 {
     using Type = std::vector<T>;
-    static  bool from_json(const char*key,const std::string &json,void*pThis,Type * offset)
+    static  bool from_json(const char*key,const std::string &json,void*pThis,OffsetType offset)
     {
-        auto && dest = *reinterpret_cast<Type*>(static_cast<char*>(pThis) + reinterpret_cast<OffsetType>(offset));
+        auto && dest = *reinterpret_cast<Type*>(static_cast<char*>(pThis) + offset);
        
         for (int i=0; i<4; i++) {
             dest.push_back(T{});
@@ -40,9 +40,9 @@ struct transform<std::vector<T>>
 template <>
 struct transform<bool>
 {
-    static  bool from_json(const char*key,const std::string &json,void*pThis,bool * offset)
+    static  bool from_json(const char*key,const std::string &json,void*pThis,OffsetType offset)
     {
-        auto && dest = *reinterpret_cast<bool*>(static_cast<char*>(pThis) + reinterpret_cast<OffsetType>(offset));
+        auto && dest = *reinterpret_cast<bool*>(static_cast<char*>(pThis) + offset);
         dest = true;
         //int *pDest = (int*)(((char*)pThis) + offset);
         std::cout << key << "--bool-" << json << "---"  << pThis  << "--"  << offset   << std::endl;
@@ -53,9 +53,9 @@ struct transform<bool>
 template <>
 struct transform<int>
 {
-    static  bool from_json(const char*key,const std::string &json,void*pThis,int * offset)
+    static  bool from_json(const char*key,const std::string &json,void*pThis,OffsetType offset)
     {
-        auto && dest = *reinterpret_cast<int*>(static_cast<char*>(pThis) + reinterpret_cast<OffsetType>(offset));
+        auto && dest = *reinterpret_cast<int*>(static_cast<char*>(pThis) + offset);
         dest = 1;
         //int *pDest = (int*)(((char*)pThis) + offset);
         std::cout << key << "--int-" << json << "---"  << pThis  << "--"  << offset   << std::endl;
@@ -68,9 +68,9 @@ template <>
 struct transform<double>
 {
   
-    static  bool from_json(const char*key,const std::string &json,void*pThis,double * offset)
+    static  bool from_json(const char*key,const std::string &json,void*pThis,OffsetType offset)
     {
-        auto && dest = *reinterpret_cast<double*>(static_cast<char*>(pThis) + reinterpret_cast<OffsetType>(offset));
+        auto && dest = *reinterpret_cast<double*>(static_cast<char*>(pThis) + offset);
         dest = 9.9;
         std::cout << key << "--double-" << json << "---"  << pThis  << "--"  << offset   << std::endl;
         return true;
@@ -81,9 +81,9 @@ struct transform<double>
 template <>
 struct transform<std::string>
 {
-    static  bool from_json(const char*key,const std::string &json,void*pThis,std::string * offset)
+    static  bool from_json(const char*key,const std::string &json,void*pThis,OffsetType offset)
     {
-        auto && dest = *reinterpret_cast<std::string*>(static_cast<char*>(pThis) + reinterpret_cast<OffsetType>(offset));
+        auto && dest = *reinterpret_cast<std::string*>(static_cast<char*>(pThis) +  offset);
         dest = "9099009llkk";
         std::cout << key << "-string--" << json << "---"  << pThis  << "--"  << offset   << std::endl;
         return true;
