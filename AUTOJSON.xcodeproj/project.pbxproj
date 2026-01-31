@@ -25,6 +25,7 @@
 /* Begin PBXFileReference section */
 		94EEFAC52F2DF928002F1790 /* AUTOJSON */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = AUTOJSON; sourceTree = BUILT_PRODUCTS_DIR; };
 		94EEFAC82F2DF928002F1790 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		94EEFACF2F2E4D17002F1790 /* AutoJson.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AutoJson.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,6 +59,7 @@
 			isa = PBXGroup;
 			children = (
 				94EEFAC82F2DF928002F1790 /* main.cpp */,
+				94EEFACF2F2E4D17002F1790 /* AutoJson.h */,
 			);
 			path = AUTOJSON;
 			sourceTree = "<group>";
