@@ -13,10 +13,17 @@ struct JOSONODEL {
 
     std::vector<int> dd;
     
+    int a2{};
+    int a3{};
+    int a4{};
+    int a5{};
+    int a6{};
+    bool aaa000;
+    
     DECLARE__JSON__AUTO__TRANSFORM
 };
 
-IMPLEMENT__JSON__AUTO__TRANSFORM(JOSONODEL,a,b,cc,dd)
+IMPLEMENT__JSON__AUTO__TRANSFORM(JOSONODEL,a,b,cc,dd,a2,a3,a4,a5,a6,aaa000)
 
 
 int main(int argc, const char * argv[]) {
