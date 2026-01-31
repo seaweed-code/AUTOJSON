@@ -117,7 +117,30 @@ const static auto_json::ReflectMapType reflect_map;  \
 inline bool transform_from_json(const std::string &json){return auto_json::transform_from_json(this, reflect_map, json);}
 
 
+#ifdef _MSC_VER ///VS2015
 
+
+#define __EXPAND__(X)  X
+#define __MACRO__ARG__COUNT__(_0, _1, _2, _3, _4, _5, _6, _7, _8,_9,_10,_11,_12,_13,_14,_15,_16,_17,_18,_19, COUNT, ...)  COUNT
+#define _MACROARGCOUNT_(...) __EXPAND__(__MACRO__ARG__COUNT__(__VA_ARGS__,20,19,18,17,16,15,14,13,12,11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1))
+
+#else //GCC  4.8.5
+
+
+#define __MACRO__ARG__COUNT__(_0, _1, _2, _3, _4, _5, _6, _7, _8,_9,_10,_11,_12,_13,_14,_15,_16,_17,_18,_19, COUNT, ...)  COUNT
+#define _MACROARGCOUNT_(...) __MACRO__ARG__COUNT__(__VA_ARGS__,20,19,18,17,16,15,14,13,12,11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1)
+
+#endif
+
+#define __CONCAT__(A,B) ____CONCAT____(A,B)
+#define ____CONCAT____(A,B)   A##B
+
+#define __CONCATFUNCTION__(...)  __CONCAT__(__ADD__JSON__KEY__ , _MACROARGCOUNT_(__VA_ARGS__))
+
+#define IMPLEMENT__JSON__AUTO__TRANSFORM(C,...)   \
+const  auto_json::ReflectMapType C::reflect_map = {\
+    __CONCATFUNCTION__(__VA_ARGS__)(C,__VA_ARGS__)  \
+};
 
 
 struct JOSONODEL {
@@ -130,13 +153,7 @@ struct JOSONODEL {
     DECLARE__JSON__AUTO__TRANSFORM;
 };
 
-//IMPLEMENT__JSON__AUTO__TRANSFORM(JOSONODEL,a,b,cc,ddddddd);
-
-const  auto_json::ReflectMapType JOSONODEL::reflect_map = {
-    __ADD__JSON__KEY__4(JOSONODEL,a,b,cc,dd)
-};
-
-
+IMPLEMENT__JSON__AUTO__TRANSFORM(JOSONODEL,a,b,cc,dd)
 
 
 int main(int argc, const char * argv[]) {
