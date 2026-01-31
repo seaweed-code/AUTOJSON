@@ -20,8 +20,18 @@ using ReflectMapType = std::unordered_map<const char*,std::pair<OffsetType,pFunc
 template <typename  T>
 struct transform;
 
-
-//bool transform_from_json(const char*key,const std::string &json,void*pThis,T * offset);
+template <typename  T>
+struct transform<std::vector<T>>
+{
+    static  bool from_json(const char*key,const std::string &json,void*pThis,std::vector<T> * offset)
+    {
+        auto && dest = *reinterpret_cast<std::vector<T>*>(static_cast<char*>(pThis) + reinterpret_cast<OffsetType>(offset));
+       // dest = true;
+        //int *pDest = (int*)(((char*)pThis) + offset);
+        std::cout << key << "--bool-" << json << "---"  << pThis  << "--"  << offset   << std::endl;
+        return true;
+    }
+};
 
 template <>
 struct transform<bool>
@@ -108,6 +118,7 @@ const  auto_json::ReflectMapType JOSONODEL::reflect_map = {
     {TO_STRING(a),{offsetof(JOSONODEL, a),(auto_json::pFuncParse)auto_json::transform<int>::from_json}},
     {TO_STRING(b),{offsetof(JOSONODEL, b),(auto_json::pFuncParse)auto_json::transform<double>::from_json}},
     {TO_STRING(cc),{offsetof(JOSONODEL, cc),(auto_json::pFuncParse)auto_json::transform<std::string>::from_json}},
+    {TO_STRING(dd),{offsetof(JOSONODEL, dd),(auto_json::pFuncParse)auto_json::transform<std::vector<int>>::from_json}},
 };
 
 int main(int argc, const char * argv[]) {
