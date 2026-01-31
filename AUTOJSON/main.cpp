@@ -77,7 +77,7 @@ struct JOSONODEL {
 const  auto_json::ReflectMapType JOSONODEL::reflect_map = {
     {TO_STRING(a),{offsetof(JOSONODEL, a),(auto_json::pFuncParse)auto_json::transfom_from_json<int>}},
     {TO_STRING(b),{offsetof(JOSONODEL, b),(auto_json::pFuncParse)auto_json::transfom_from_json<double>}},
-    {TO_STRING(cc),{offsetof(JOSONODEL, cc),(auto_json::pFuncParse)auto_json::transfom_from_json<std::string >}},
+    {TO_STRING(cc),{offsetof(JOSONODEL, cc),(auto_json::pFuncParse)auto_json::transfom_from_json<std::string>}},
 };
 
 int main(int argc, const char * argv[]) {
