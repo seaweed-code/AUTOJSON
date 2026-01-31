@@ -106,16 +106,19 @@ bool transform_from_json(void *pThis,const auto_json::ReflectMapType &reflect_ma
 
 };
 
+#define DECLARE__JSON__AUTO__TRANSFORM  \
+const static auto_json::ReflectMapType reflect_map;  \
+inline bool transform_from_json(const std::string &json){return auto_json::transform_from_json(this, reflect_map, json);}
+
+
 struct JOSONODEL {
     int a{};
     double b{};
     std::string cc;
 
     std::vector<int> dd;
-
-    const static auto_json::ReflectMapType reflect_map;
-    inline bool transform_from_json(const std::string &json){return auto_json::transform_from_json(this, reflect_map, json);}
     
+    DECLARE__JSON__AUTO__TRANSFORM;
 };
 
 const  auto_json::ReflectMapType JOSONODEL::reflect_map = {
@@ -130,6 +133,7 @@ int main(int argc, const char * argv[]) {
     
     
     JOSONODEL aa;
+    
     aa.transform_from_json(json);
     
     
