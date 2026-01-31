@@ -14,10 +14,40 @@
             filePath = "AUTOJSON/main.cpp"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "136"
-            endingLineNumber = "136"
+            startingLineNumber = "139"
+            endingLineNumber = "139"
             landmarkName = "main(argc, argv)"
             landmarkType = "9">
+            <Locations>
+               <Location
+                  uuid = "88712964-929E-4A76-A9EB-70BAB685A7E0 - cd60e03ee0567ae3"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "main"
+                  moduleName = "AUTOJSON"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/marvel/Desktop/AUTOJSON/AUTOJSON/main.cpp"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "137"
+                  endingLineNumber = "137">
+               </Location>
+               <Location
+                  uuid = "88712964-929E-4A76-A9EB-70BAB685A7E0 - cd60e03ee0567946"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "main"
+                  moduleName = "AUTOJSON"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/marvel/Desktop/AUTOJSON/AUTOJSON/main.cpp"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "140"
+                  endingLineNumber = "140">
+               </Location>
+            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

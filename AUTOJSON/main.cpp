@@ -67,7 +67,6 @@ struct transform<int>
 template <>
 struct transform<double>
 {
-  
     static  bool from_json(const char*key,const std::string &json,void*pThis,OffsetType offset)
     {
         auto && dest = *reinterpret_cast<double*>(static_cast<char*>(pThis) + offset);
@@ -111,6 +110,10 @@ const static auto_json::ReflectMapType reflect_map;  \
 inline bool transform_from_json(const std::string &json){return auto_json::transform_from_json(this, reflect_map, json);}
 
 
+#define ___JSON___PROPERTY___(MODEL,KEY)   \
+{TO_STRING(KEY),{offsetof(MODEL, KEY),(auto_json::pFuncParse)auto_json::transform<decltype(MODEL::KEY)>::from_json}},
+
+
 struct JOSONODEL {
     int a{};
     double b{};
@@ -122,10 +125,10 @@ struct JOSONODEL {
 };
 
 const  auto_json::ReflectMapType JOSONODEL::reflect_map = {
-    {TO_STRING(a),{offsetof(JOSONODEL, a),(auto_json::pFuncParse)auto_json::transform<decltype(JOSONODEL::a)>::from_json}},
-    {TO_STRING(b),{offsetof(JOSONODEL, b),(auto_json::pFuncParse)auto_json::transform<decltype(JOSONODEL::b)>::from_json}},
-    {TO_STRING(cc),{offsetof(JOSONODEL, cc),(auto_json::pFuncParse)auto_json::transform<decltype(JOSONODEL::cc)>::from_json}},
-    {TO_STRING(dd),{offsetof(JOSONODEL, dd),(auto_json::pFuncParse)auto_json::transform<decltype(JOSONODEL::dd)>::from_json}},
+    ___JSON___PROPERTY___(JOSONODEL,a)
+    ___JSON___PROPERTY___(JOSONODEL,b)
+    ___JSON___PROPERTY___(JOSONODEL,cc)
+    ___JSON___PROPERTY___(JOSONODEL,dd)
 };
 
 int main(int argc, const char * argv[]) {
