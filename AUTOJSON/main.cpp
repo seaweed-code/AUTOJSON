@@ -10,6 +10,15 @@
 #include <vector>
 
 
+
+#define __ADD__JSON__KEY__1(MODEL,_1)  {#_1,{offsetof(MODEL, _1),(auto_json::pFuncParse)auto_json::transform<decltype(MODEL::_1)>::from_json}},
+
+
+#define __ADD__JSON__KEY__2(MODEL,_1,_2)      __ADD__JSON__KEY__1(MODEL,_1) __ADD__JSON__KEY__1(MODEL,_2)
+#define __ADD__JSON__KEY__3(MODEL,_1,_2,_3)   __ADD__JSON__KEY__2(MODEL,_1,_2) __ADD__JSON__KEY__1(MODEL,_3)
+#define __ADD__JSON__KEY__4(MODEL,_1,_2,_3,_4)   __ADD__JSON__KEY__3(MODEL,_1,_2,_3) __ADD__JSON__KEY__1(MODEL,_4)
+
+
 namespace auto_json {
 
 using OffsetType = size_t;
@@ -110,8 +119,6 @@ const static auto_json::ReflectMapType reflect_map;  \
 inline bool transform_from_json(const std::string &json){return auto_json::transform_from_json(this, reflect_map, json);}
 
 
-#define ___JSON___PROPERTY___(MODEL,KEY)   \
-{#KEY,{offsetof(MODEL, KEY),(auto_json::pFuncParse)auto_json::transform<decltype(MODEL::KEY)>::from_json}},
 
 
 
@@ -130,11 +137,11 @@ struct JOSONODEL {
 //IMPLEMENT__JSON__AUTO__TRANSFORM(JOSONODEL,a,b,cc,ddddddd);
 
 const  auto_json::ReflectMapType JOSONODEL::reflect_map = {
-    ___JSON___PROPERTY___(JOSONODEL,a)
-    ___JSON___PROPERTY___(JOSONODEL,b)
-    ___JSON___PROPERTY___(JOSONODEL,cc)
-    ___JSON___PROPERTY___(JOSONODEL,dd)
+    __ADD__JSON__KEY__4(JOSONODEL,a,b,cc,dd)
 };
+
+
+
 
 int main(int argc, const char * argv[]) {
     std::string json = "{\"id\": \"1\",    \"name\": \"mmahew\",    \"url\": \"www.runoob.com\"}";
