@@ -22,11 +22,16 @@ using ReflectMapType = std::unordered_map<const char*,std::pair<OffsetType,pFunc
 template <typename  T,typename Enable = void>
 struct transform;
 
-template<typename T, typename = void>
-struct HasReflectType : std::false_type {};
 
-template<typename T>
-struct HasReflectType<T, std::void_t<decltype(T::reflect_map)>>: std::true_type {};
+template <typename  T>
+struct transform<T,std::enable_if_t<std::is_same_v<decltype(T::reflect_map),const ReflectMapType>>>
+{
+    static  bool from_json(const char*key,const std::string &json,void*pThis,OffsetType offset)
+    {
+        std::cout << key << "--customeClass-" << json << "---"  << pThis  << "--"  << offset   << std::endl;
+        return true;
+    }
+};
 
 template <typename  T>
 struct transform<std::vector<T>>
