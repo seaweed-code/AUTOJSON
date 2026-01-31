@@ -24,7 +24,11 @@ bool transfom_from_json(const char*key,const std::string &json,void*pThis,T * of
 template <>
 bool transfom_from_json<bool>(const char*key,const std::string &json,void*pThis,bool * offset)
 {
-    return  true;
+    auto && dest = *reinterpret_cast<bool*>(static_cast<char*>(pThis) + reinterpret_cast<OffsetType>(offset));
+    dest = true;
+    //int *pDest = (int*)(((char*)pThis) + offset);
+    std::cout << key << "--bool-" << json << "---"  << pThis  << "--"  << offset   << std::endl;
+    return true;
 }
 
 template <>
