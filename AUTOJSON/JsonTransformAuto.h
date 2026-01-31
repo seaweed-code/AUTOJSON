@@ -104,7 +104,7 @@ struct transform<std::string>
 
 
 
-bool transform_from_json(void *pThis,const auto_json::ReflectMapType &reflect_map ,const std::string&json)
+bool transform_from_json(void *pThis,const ReflectMapType &reflect_map ,const std::string&json)
 {
     for (auto&& p:reflect_map)
     {
