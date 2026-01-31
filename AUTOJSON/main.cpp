@@ -70,7 +70,7 @@ struct JOSONODEL {
     std::vector<int> dd;
 
     const static auto_json::ReflectMapType reflect_map;
-    JOSONODEL(const std::string &json){auto_json::transform_to_model(this, reflect_map, json);}
+    inline bool transform_from_json(const std::string &json){return auto_json::transform_to_model(this, reflect_map, json);}
     
 };
 
@@ -84,7 +84,9 @@ int main(int argc, const char * argv[]) {
     std::string json = "{\"id\": \"1\",    \"name\": \"mmahew\",    \"url\": \"www.runoob.com\"}";
     
     
-    JOSONODEL aa(json);
+    JOSONODEL aa;
+    aa.transform_from_json(json);
+    
     
     
     std::cout << "Hello, World!\n";
