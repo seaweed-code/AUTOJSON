@@ -12,10 +12,10 @@
 
 namespace auto_json {
 
-
 using OffsetType = size_t;
-
 using pFuncParse = bool(*)(const char*key,const std::string &json,void*pThis,void*PType);
+
+using ReflectMapType = std::unordered_map<const char*,std::pair<OffsetType,pFuncParse>>;
 
 template <typename  T>
 bool transfom_from_json(const char*key,const std::string &json,void*pThis,T * offset);
@@ -58,7 +58,7 @@ struct JOSONODEL {
 
     std::vector<int> dd;
 
-    const static std::unordered_map<const char*,std::pair<auto_json::OffsetType, auto_json::pFuncParse>> reflect_map;
+    const static auto_json::ReflectMapType reflect_map;
     JOSONODEL(const std::string &json){
         for (auto&& p:reflect_map)
         {
