@@ -20,6 +20,13 @@ using ReflectMapType = std::unordered_map<const char*,std::pair<OffsetType,pFunc
 template <typename  T>
 bool transfom_from_json(const char*key,const std::string &json,void*pThis,T * offset);
 
+
+template <>
+bool transfom_from_json<bool>(const char*key,const std::string &json,void*pThis,bool * offset)
+{
+    return  true;
+}
+
 template <>
 bool transfom_from_json<int>(const char*key,const std::string &json,void*pThis,int * offset)
 {
