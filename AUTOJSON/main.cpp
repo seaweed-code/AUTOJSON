@@ -13,7 +13,7 @@
 namespace auto_json {
 
 using OffsetType = size_t;
-using pFuncParse = bool(*)(const char*key,const std::string &json,void*pThis,void*offset);
+using pFuncParse = bool(*)(const char*key,const std::string &json,void*pThis,OffsetType offset);
 
 using ReflectMapType = std::unordered_map<const char*,std::pair<OffsetType,pFuncParse>>;
 
@@ -96,7 +96,7 @@ bool transform_from_json(void *pThis,const auto_json::ReflectMapType &reflect_ma
 {
     for (auto&& p:reflect_map)
     {
-       auto success =  p.second.second(p.first,json,pThis,reinterpret_cast<void*>(p.second.first));
+       auto success =  p.second.second(p.first,json,pThis,p.second.first);
         if (!success)
         {
         }
