@@ -1,6 +1,6 @@
 //
-//  AutoJson.h
-//  AUTOJSON
+//  JsonTransformAuto.h
+//  JsonTransformAuto
 //
 //  Created by Matthew on 2026/1/31.
 //
@@ -166,4 +166,4 @@ const  auto_json::ReflectMapType C::reflect_map = {\
 
 
 
-#endif /* AutoJson_h */
+#endif /* JsonTransformAuto.h */
