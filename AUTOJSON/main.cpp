@@ -57,9 +57,9 @@ struct JOSONODEL {
     std::string cc;
   
 
-    const static std::unordered_map<const char*,std::pair<auto_json::OffsetType, auto_json::FuncPtr>> key_fn;
+    const static std::unordered_map<const char*,std::pair<auto_json::OffsetType, auto_json::FuncPtr>> reflect_map;
     JOSONODEL(const std::string &json){
-        for (auto&& p:key_fn)
+        for (auto&& p:reflect_map)
         {
            auto success =  p.second.second(p.first,json,this,reinterpret_cast<void*>(p.second.first));
             if (!success)
@@ -70,7 +70,7 @@ struct JOSONODEL {
     
 };
 
-const  std::unordered_map<const char*,std::pair<auto_json::OffsetType, auto_json::FuncPtr>> JOSONODEL::key_fn = {
+const  std::unordered_map<const char*,std::pair<auto_json::OffsetType, auto_json::FuncPtr>> JOSONODEL::reflect_map = {
     {TO_STRING(a),{offsetof(JOSONODEL, a),(auto_json::FuncPtr)auto_json::transfom_from_json<int>}},
     {TO_STRING(b),{offsetof(JOSONODEL, b),(auto_json::FuncPtr)auto_json::transfom_from_json<double>}},
     {TO_STRING(cc),{offsetof(JOSONODEL, cc),(auto_json::FuncPtr)auto_json::transfom_from_json<std::string >}},
