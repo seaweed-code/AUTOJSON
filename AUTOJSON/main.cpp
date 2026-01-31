@@ -15,7 +15,7 @@ namespace auto_json {
 
 using OffsetType = size_t;
 
-using FuncPtr = bool(*)(const char*key,const std::string &json,void*pThis,void*PType);
+using Transform_From_FUNC = bool(*)(const char*key,const std::string &json,void*pThis,void*PType);
 
 template <typename  T>
 bool transfom_from_json(const char*key,const std::string &json,void*pThis,T * offset);
@@ -57,7 +57,7 @@ struct JOSONODEL {
     std::string cc;
   
 
-    const static std::unordered_map<const char*,std::pair<auto_json::OffsetType, auto_json::FuncPtr>> reflect_map;
+    const static std::unordered_map<const char*,std::pair<auto_json::OffsetType, auto_json::Transform_From_FUNC>> reflect_map;
     JOSONODEL(const std::string &json){
         for (auto&& p:reflect_map)
         {
@@ -70,10 +70,10 @@ struct JOSONODEL {
     
 };
 
-const  std::unordered_map<const char*,std::pair<auto_json::OffsetType, auto_json::FuncPtr>> JOSONODEL::reflect_map = {
-    {TO_STRING(a),{offsetof(JOSONODEL, a),(auto_json::FuncPtr)auto_json::transfom_from_json<int>}},
-    {TO_STRING(b),{offsetof(JOSONODEL, b),(auto_json::FuncPtr)auto_json::transfom_from_json<double>}},
-    {TO_STRING(cc),{offsetof(JOSONODEL, cc),(auto_json::FuncPtr)auto_json::transfom_from_json<std::string >}},
+const  std::unordered_map<const char*,std::pair<auto_json::OffsetType, auto_json::Transform_From_FUNC>> JOSONODEL::reflect_map = {
+    {TO_STRING(a),{offsetof(JOSONODEL, a),(auto_json::Transform_From_FUNC)auto_json::transfom_from_json<int>}},
+    {TO_STRING(b),{offsetof(JOSONODEL, b),(auto_json::Transform_From_FUNC)auto_json::transfom_from_json<double>}},
+    {TO_STRING(cc),{offsetof(JOSONODEL, cc),(auto_json::Transform_From_FUNC)auto_json::transfom_from_json<std::string >}},
 };
 
 int main(int argc, const char * argv[]) {
