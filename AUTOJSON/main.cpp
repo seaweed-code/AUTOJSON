@@ -13,7 +13,7 @@ struct JOSONODEL {
 
     std::vector<int> dd;
     
-    DECLARE__JSON__AUTO__TRANSFORM;
+    DECLARE__JSON__AUTO__TRANSFORM
 };
 
 IMPLEMENT__JSON__AUTO__TRANSFORM(JOSONODEL,a,b,cc,dd)
