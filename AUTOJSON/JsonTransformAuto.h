@@ -7,9 +7,6 @@
 
 #ifndef __AUTO__TRANSFORM_JSON__H__
 #define __AUTO__TRANSFORM_JSON__H__
-
-
-
 #include <iostream>
 #include <unordered_map>
 #include <vector>
