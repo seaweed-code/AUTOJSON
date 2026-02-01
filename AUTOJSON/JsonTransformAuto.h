@@ -49,14 +49,23 @@ struct transform<std::vector<T>,std::enable_if_t<std::is_same_v<decltype(T::refl
     using Type = std::vector<T>;
     static  bool from_json(const char*key,const JsonLocation &json,void*pThis,OffsetType offset)
     {
-        auto && dest = *reinterpret_cast<Type*>(static_cast<char*>(pThis) + offset);
-       
-        for (int i=0; i<4; i++) {
-            dest.push_back(T{});
+        if (json.HasMember(key)) {
+            auto&& datas = json[key];
+            if (datas.IsArray() && datas.Size() > 0) {
+                auto && dest = *reinterpret_cast<Type*>(static_cast<char*>(pThis) + offset);
+                dest.resize(datas.Size());
+                for (int i=0; i<datas.Size(); i++) 
+                {
+                    auto && data = datas[i];
+                    if (data.IsObject()) 
+                    {
+                        
+                    }
+                }
+                return  true;
+            }
         }
-        
-       // std::cout << key << "--bool-" << json << "---"  << pThis  << "--"  << offset   << std::endl;
-        return true;
+        return false;
     }
 };
 
@@ -72,7 +81,7 @@ struct transform<std::vector<T>>
                 auto && dest = *reinterpret_cast<Type*>(static_cast<char*>(pThis) + offset);
                 dest.resize(datas.Size());
                 for (int i=0; i<datas.Size(); i++) {
-                    
+                    from_json(nullptr,datas, &dest[i],i);
                 }
                 return  true;
             }
