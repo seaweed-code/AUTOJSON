@@ -20,12 +20,13 @@ namespace auto_json {
 using JsonLocation = rapidjson::Value;
 using OffsetType = size_t;
 using pFuncParse = bool(*)(const char*key,const JsonLocation &json,void*pThis,OffsetType offset);
+using pFuncParseToJson = void(*)(const char*key,rapidjson::Document &doc,void*pThis,OffsetType offset);
 
 struct ReflectInfo
 {
-    
     OffsetType offset;
     pFuncParse from_json;
+    pFuncParseToJson to_json;
 };
 
 using ReflectMapType = std::unordered_map<const char*,ReflectInfo>;
@@ -192,9 +193,10 @@ std::string transform_to_json(void *pThis,const ReflectMapType &reflect_map)
 {
     rapidjson::Document doc;
     doc.SetObject();
-
-    
-    
+    for (auto&& p:reflect_map)
+    {
+        p.second.to_json(p.first,doc,pThis,p.second.offset);
+    }
     rapidjson::StringBuffer buffer;
     rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
     doc.Accept(writer);
