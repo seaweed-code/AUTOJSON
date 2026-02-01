@@ -20,7 +20,7 @@ namespace auto_json {
 using JsonLocation = rapidjson::Value;
 using OffsetType = size_t;
 using pFuncParse = bool(*)(const char*key,const JsonLocation &json,void*pThis,OffsetType offset);
-using pFuncParseToJson = void(*)(const char*key,rapidjson::Document &doc,void*pThis,OffsetType offset);
+using pFuncParseToJson = void(*)(const char*key,rapidjson::Value &value,rapidjson::Document::AllocatorType &allocator,void*pThis,OffsetType offset);
 
 struct ReflectInfo
 {
@@ -271,19 +271,20 @@ bool transform_from_json(void *pThis,const ReflectMapType &reflect_map ,const st
     return transform_from_json(pThis, reflect_map, root);
 }
 
-void transform_to_json(void *pThis,rapidjson::Document &doc,const ReflectMapType &reflect_map)
+void transform_to_json(void *pThis,rapidjson::Value &value,rapidjson::Document::AllocatorType &allocator,const ReflectMapType &reflect_map)
 {
     for (auto&& p:reflect_map)
     {
-        p.second.to_json(p.first,doc,pThis,p.second.offset);
+        p.second.to_json(p.first,value,allocator,pThis,p.second.offset);
     }
 }
 
 std::string transform_to_json(void *pThis,const ReflectMapType &reflect_map)
 {
     rapidjson::Document doc;
+    auto &allocator = doc.GetAllocator();
     doc.SetObject();
-    transform_to_json(pThis, doc, reflect_map);
+    transform_to_json(pThis, doc,allocator, reflect_map);
     rapidjson::StringBuffer buffer;
     rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
     doc.Accept(writer);
