@@ -50,32 +50,7 @@ struct transform<T,std::enable_if_t<std::is_same_v<decltype(T::reflect_map),cons
         return false;
     }
 };
-/*
-template <typename  T>
-struct transform<std::vector<T>,std::enable_if_t<std::is_same_v<decltype(T::reflect_map),const ReflectMapType>>>
-{
-    using Type = std::vector<T>;
-    static  bool from_json(const char*key,const JsonLocation &json,void*pThis,OffsetType offset)
-    {
-        if (json.HasMember(key)) {
-            auto&& datas = json[key];
-            if (datas.IsArray() && datas.Size() > 0) {
-                auto && dest = *reinterpret_cast<Type*>(static_cast<char*>(pThis) + offset);
-                dest.resize(datas.Size());
-                for (int i=0; i<datas.Size(); i++) 
-                {
-                    auto && data = datas[i];
-                    if (data.IsObject()) 
-                    {
-                        
-                    }
-                }
-                return  true;
-            }
-        }
-        return false;
-    }
-};*/
+
 
 template <typename  T>
 struct transform<std::vector<T>>
