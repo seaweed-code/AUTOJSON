@@ -205,15 +205,15 @@ struct transform<T,std::enable_if_t<std::is_integral_v<T>>>
     using Type = T;
     static  bool from_json(const char*key,const JsonLocation &json,void*pThis,OffsetType offset)
     {
+        using GenericType = std::decay_t<decltype(json[key])>;
         if (key == nullptr) {///array
             auto && dest = *reinterpret_cast<Type*>(pThis);
-            using GenericType = std::decay_t<decltype(json[0])>;
             dest = adapter<T,typename GenericType::EncodingType,typename GenericType::AllocatorType>::get(json[static_cast<int>(offset)]);
             return true;
         }
         auto && dest = *reinterpret_cast<Type*>(static_cast<char*>(pThis) + offset);
         if (json.HasMember(key)) {
-            using GenericType = std::decay_t<decltype(json[key])>;
+           
             dest = adapter<T,typename GenericType::EncodingType,typename GenericType::AllocatorType>::get(json[key]);
             return  true;
         }
