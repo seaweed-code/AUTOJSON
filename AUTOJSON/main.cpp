@@ -30,7 +30,7 @@ struct JOSONODEL {
     int a6{};
     bool aaa000;
     
-    AA users;
+    std::vector<AA> users;
     
     DECLARE__JSON__AUTO__TRANSFORM
 };
