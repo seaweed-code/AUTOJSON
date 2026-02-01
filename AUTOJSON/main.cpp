@@ -40,8 +40,8 @@ struct JOSONODEL {
     
     DECLARE__JSON__AUTO__TRANSFORM
 };
-IMPLEMENT__JSON__AUTO__TRANSFORM(JOSONODEL,id,url,name,score,pppp,intts)
-//IMPLEMENT__JSON__AUTO__TRANSFORM(JOSONODEL,a,b,url,dd,name,id,a3,a4,a5,a6,aaa000,users,boosaa)
+//IMPLEMENT__JSON__AUTO__TRANSFORM(JOSONODEL,id,url,name,score,pppp,intts)
+IMPLEMENT__JSON__AUTO__TRANSFORM(JOSONODEL,a,b,url,dd,name,id,a3,a4,a5,a6,score,aaa000,boosaa,pppp,intts)
 IMPLEMENT__JSON__AUTO__TRANSFORM(AA,id,name,online)
 
 int main(int argc, const char * argv[]) {
@@ -52,15 +52,7 @@ int main(int argc, const char * argv[]) {
     aa.transform_from_json(json);
     
     auto sss = aa.transform_to_json();
-    
-    //生成Json串
-       rapidjson::Document jsonDoc;    //生成一个dom元素Document
-       rapidjson::Document::AllocatorType &allocator = jsonDoc.GetAllocator(); //获取分配器
-       jsonDoc.SetObject();    //将当前的Document设置为一个object，也就是说，整个Document是一个Object类型的dom元素
-
-       //添加属性
-       jsonDoc.AddMember("name", "qfl", allocator);    //添加字符串值
-       jsonDoc.AddMember("age", 20, allocator);
+  
     
     std::cout << "Hello, World!\n";
     return 0;

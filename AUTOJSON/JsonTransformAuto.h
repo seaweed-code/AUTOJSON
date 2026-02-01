@@ -63,15 +63,14 @@ struct transform<T,std::enable_if_t<std::is_same_v<decltype(T::reflect_map),cons
     {
         if (key == nullptr) {///array
             auto && dest = *reinterpret_cast<Type*>(pThis);
-            
-           // dest = json[static_cast<int>(offset)].GetInt();
+            dest.transform_to_json(value,allocator);
             return;
         }
+        rapidjson::Value k;
+        k.SetString(key, allocator);
         auto && dest = *reinterpret_cast<Type*>(static_cast<char*>(pThis) +  offset);
         rapidjson::Value obj(rapidjson::kObjectType);
         dest.transform_to_json(obj,allocator);
-        rapidjson::Value k;
-        k.SetString(key, allocator);
         value.AddMember(k, obj, allocator);
     }
 };
@@ -142,7 +141,7 @@ struct transform<bool>
 
         rapidjson::Value v;
         v.SetBool(dest);
-        value.AddMember(k, v, allocator);
+      // value.AddMember(k, v, allocator);
     }
 };
 
