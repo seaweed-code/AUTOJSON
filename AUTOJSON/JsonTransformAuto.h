@@ -47,22 +47,38 @@ struct  adapter;
 template <typename Encoding, typename Allocator>
 struct  adapter<int,Encoding,Allocator>
 {
-   inline static int get(rapidjson::GenericValue<Encoding,Allocator>&value)  {return value.GetInt();}
-    inline static void set(rapidjson::GenericValue<Encoding,Allocator>&value,int newValue){return value.SetInt(newValue);}
+    using Type = int;
+    inline static Type get(rapidjson::GenericValue<Encoding,Allocator>&value)  {return value.GetInt();}
+    inline static void set(rapidjson::GenericValue<Encoding,Allocator>&value,Type newValue){return value.SetInt(newValue);}
 };
 
 template <typename Encoding, typename Allocator>
 struct  adapter<int64_t,Encoding,Allocator>
 {
-   inline static int64_t get(rapidjson::GenericValue<Encoding,Allocator>&value)  {return value.GetInt64();}
-    inline static void set(rapidjson::GenericValue<Encoding,Allocator>&value,int64_t newValue){return value.SetInt64(newValue);}
+    using Type = int64_t;
+   inline static Type get(rapidjson::GenericValue<Encoding,Allocator>&value)  {return value.GetInt64();}
+    inline static void set(rapidjson::GenericValue<Encoding,Allocator>&value,Type newValue){return value.SetInt64(newValue);}
 };
-
+template <typename Encoding, typename Allocator>
+struct  adapter<double,Encoding,Allocator>
+{
+    using Type = double;
+   inline static Type get(rapidjson::GenericValue<Encoding,Allocator>&value)  {return value.GetDouble();}
+    inline static void set(rapidjson::GenericValue<Encoding,Allocator>&value,Type newValue){return value.SetDouble(newValue);}
+};
+template <typename Encoding, typename Allocator>
+struct  adapter<float,Encoding,Allocator>
+{
+    using Type = float;
+   inline static Type get(rapidjson::GenericValue<Encoding,Allocator>&value)  {return value.GetFloat();}
+    inline static void set(rapidjson::GenericValue<Encoding,Allocator>&value,Type newValue){return value.SetFloat(newValue);}
+};
 template <typename Encoding, typename Allocator>
 struct  adapter<bool,Encoding,Allocator>
 {
-   inline static bool get(rapidjson::GenericValue<Encoding,Allocator>&value)  {return value.GetBool();}
-    inline static void set(rapidjson::GenericValue<Encoding,Allocator>&value,bool newValue){return value.SetBool(newValue);}
+    using Type = bool;
+    inline static Type get(rapidjson::GenericValue<Encoding,Allocator>&value)  {return value.GetBool();}
+    inline static void set(rapidjson::GenericValue<Encoding,Allocator>&value,Type newValue){return value.SetBool(newValue);}
 };
 
 template <typename  T,typename Enable = void>
