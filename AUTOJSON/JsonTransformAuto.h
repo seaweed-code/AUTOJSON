@@ -35,8 +35,7 @@ struct transform<T,std::enable_if_t<std::is_same_v<decltype(T::reflect_map),cons
             auto&& obj = json[key];
             if (obj.IsObject()) {
                 auto && dest = *reinterpret_cast<T*>(static_cast<char*>(pThis) + offset);
-               // dest.
-                return  true;
+                return  dest.transform_from_json(obj);
             }
         }
         return false;
