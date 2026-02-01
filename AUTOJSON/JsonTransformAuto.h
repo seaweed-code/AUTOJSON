@@ -41,6 +41,16 @@ template <typename  T>
 struct  is_reflect_type<T,_is_reflect_type_<T>>:std::true_type{};
 
 
+template <typename  T,typename Encoding, typename Allocator>
+struct  adapter;
+
+template <typename Encoding, typename Allocator>
+struct  adapter<int,Encoding,Allocator>
+{
+   inline static int get(rapidjson::GenericValue<Encoding,Allocator>&value)  {return value.GetInt();}
+    inline static void set(rapidjson::GenericValue<Encoding,Allocator>&value,int newValue){return value.SetInt(newValue);}
+};
+
 template <typename  T,typename Enable = void>
 struct transform;
 
