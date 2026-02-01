@@ -142,14 +142,16 @@ struct transform<std::string>
 
 bool transform_from_json(void *pThis,const ReflectMapType &reflect_map ,const JsonLocation& json)
 {
+    unsigned int total{};
     for (auto&& p:reflect_map)
     {
        auto success =  p.second.second(p.first,json,pThis,p.second.first);
         if (!success)
         {
+            total ++;
         }
     }
-    return  true;
+    return  total == 0;
 }
 
 bool transform_from_json(void *pThis,const ReflectMapType &reflect_map ,const std::string& json)
