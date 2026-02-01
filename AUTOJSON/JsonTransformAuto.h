@@ -84,6 +84,7 @@ struct transform<std::vector<T>>
 template <>
 struct transform<bool>
 {
+    using Type = bool;
     static  bool from_json(const char*key,const JsonLocation &json,void*pThis,OffsetType offset)
     {
         if (key == nullptr) {///unsupport
@@ -91,7 +92,7 @@ struct transform<bool>
             return  false;
         }
         if (json.HasMember(key)) {
-            auto && dest = *reinterpret_cast<bool*>(static_cast<char*>(pThis) + offset);
+            auto && dest = *reinterpret_cast<Type*>(static_cast<char*>(pThis) + offset);
             dest =   json[key].GetBool();
             return  true;
         }
@@ -101,7 +102,7 @@ struct transform<bool>
     static  void to_json(const char*key,rapidjson::Document &doc,void*pThis,OffsetType offset)
     {
         auto&& allocator = doc.GetAllocator();
-        auto && dest = *reinterpret_cast<bool*>(static_cast<char*>(pThis) +  offset);
+        auto && dest = *reinterpret_cast<Type*>(static_cast<char*>(pThis) +  offset);
         rapidjson::Value k;
         k.SetString(key, allocator);
 
