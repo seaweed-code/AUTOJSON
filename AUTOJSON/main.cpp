@@ -28,7 +28,7 @@ struct JOSONODEL {
     int a4{};
     int a5{};
     int a6{};
-    bool aaa000;
+    bool aaa000{};
     
     std::vector<AA> users;
     
