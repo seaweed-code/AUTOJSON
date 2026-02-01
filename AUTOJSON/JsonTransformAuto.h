@@ -96,7 +96,7 @@ struct transform<bool>
     static  bool from_json(const char*key,const JsonLocation &json,void*pThis,OffsetType offset)
     {
         if (key == nullptr) {///array
-            auto && dest = *reinterpret_cast<bool*>(static_cast<char*>(pThis));
+            auto && dest = *reinterpret_cast<bool*>(pThis);
             dest = json[static_cast<int>(offset)].GetBool();
             return true;
         }
