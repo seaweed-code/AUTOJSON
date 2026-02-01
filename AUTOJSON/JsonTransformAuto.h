@@ -163,7 +163,7 @@ struct transform<std::vector<T>>
         value.AddMember(k, elements, allocator);//添加数组
     }
 };
-
+/*
 template <>
 struct transform<bool>
 {
@@ -196,7 +196,7 @@ struct transform<bool>
         v.SetBool(dest);
         value.AddMember(k, v, allocator);
     }
-};
+};*/
 
 
 template <typename  T>
