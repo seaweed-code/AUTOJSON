@@ -141,7 +141,7 @@ struct transform<bool>
 
         rapidjson::Value v;
         v.SetBool(dest);
-      // value.AddMember(k, v, allocator);
+        value.AddMember(k, v, allocator);
     }
 };
 
