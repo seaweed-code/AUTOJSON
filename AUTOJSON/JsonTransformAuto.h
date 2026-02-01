@@ -115,14 +115,15 @@ struct transform<bool>
 template <>
 struct transform<int>
 {
+    using Type = int;
     static  bool from_json(const char*key,const JsonLocation &json,void*pThis,OffsetType offset)
     {
         if (key == nullptr) {///array
-            auto && dest = *reinterpret_cast<int*>(pThis);
+            auto && dest = *reinterpret_cast<Type*>(pThis);
             dest = json[static_cast<int>(offset)].GetInt();
             return true;
         }
-        auto && dest = *reinterpret_cast<int*>(static_cast<char*>(pThis) + offset);
+        auto && dest = *reinterpret_cast<Type*>(static_cast<char*>(pThis) + offset);
         if (json.HasMember(key)) {
             dest =   json[key].GetInt();
             return  true;
@@ -133,7 +134,7 @@ struct transform<int>
     static  void to_json(const char*key,rapidjson::Document &doc,void*pThis,OffsetType offset)
     {
         auto&& allocator = doc.GetAllocator();
-        auto && dest = *reinterpret_cast<int*>(static_cast<char*>(pThis) +  offset);
+        auto && dest = *reinterpret_cast<Type*>(static_cast<char*>(pThis) +  offset);
         rapidjson::Value k;
         k.SetString(key, allocator);
 
@@ -147,16 +148,17 @@ struct transform<int>
 template <>
 struct transform<double>
 {
+    using Type = double;
     static  bool from_json(const char*key,const JsonLocation &json,void*pThis,OffsetType offset)
     {
         if (key == nullptr) {///array
-            auto && dest = *reinterpret_cast<double*>(pThis);
+            auto && dest = *reinterpret_cast<Type*>(pThis);
             dest = json[static_cast<int>(offset)].GetDouble();
             return true;
         }
        
         if (json.HasMember(key)) {
-            auto && dest = *reinterpret_cast<double*>(static_cast<char*>(pThis) + offset);
+            auto && dest = *reinterpret_cast<Type*>(static_cast<char*>(pThis) + offset);
             dest =   json[key].GetDouble();
             return  true;
         }
@@ -166,7 +168,7 @@ struct transform<double>
     static  void to_json(const char*key,rapidjson::Document &doc,void*pThis,OffsetType offset)
     {
         auto&& allocator = doc.GetAllocator();
-        auto && dest = *reinterpret_cast<double*>(static_cast<char*>(pThis) +  offset);
+        auto && dest = *reinterpret_cast<Type*>(static_cast<char*>(pThis) +  offset);
         rapidjson::Value k;
         k.SetString(key, allocator);
 
@@ -180,16 +182,17 @@ struct transform<double>
 template <>
 struct transform<std::string>
 {
+    using Type = std::string;
     static  bool from_json(const char*key,const JsonLocation &json,void*pThis,OffsetType offset)
     {
         if (key == nullptr) {///array
-            auto && dest = *reinterpret_cast<std::string*>(pThis);
+            auto && dest = *reinterpret_cast<Type*>(pThis);
             dest = json[static_cast<int>(offset)].GetString();
             return true;
         }
       
         if (json.HasMember(key)) {
-            auto && dest = *reinterpret_cast<std::string*>(static_cast<char*>(pThis) +  offset);
+            auto && dest = *reinterpret_cast<Type*>(static_cast<char*>(pThis) +  offset);
             dest =   json[key].GetString();
             return  true;
         }
@@ -199,7 +202,7 @@ struct transform<std::string>
     static  void to_json(const char*key,rapidjson::Document &doc,void*pThis,OffsetType offset)
     {
         auto&& allocator = doc.GetAllocator();
-        auto && dest = *reinterpret_cast<std::string*>(static_cast<char*>(pThis) +  offset);
+        auto && dest = *reinterpret_cast<Type*>(static_cast<char*>(pThis) +  offset);
         rapidjson::Value k;
         k.SetString(key, allocator);
 
