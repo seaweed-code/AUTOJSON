@@ -205,15 +205,16 @@ struct transform<T,std::enable_if_t<std::is_integral_v<T>>>
     using Type = T;
     static  bool from_json(const char*key,const JsonLocation &json,void*pThis,OffsetType offset)
     {
-        using GenericType = std::decay_t<decltype(json[key])>;
+        using Encoding = typename JsonLocation::EncodingType;
+        using Allocator = typename JsonLocation::AllocatorType;
         if (key == nullptr) {///array
             auto && dest = *reinterpret_cast<Type*>(pThis);
-            dest = adapter<T,typename GenericType::EncodingType,typename GenericType::AllocatorType>::get(json[static_cast<int>(offset)]);
+            dest = adapter<T,Encoding,Allocator>::get(json[static_cast<int>(offset)]);
             return true;
         }
         auto && dest = *reinterpret_cast<Type*>(static_cast<char*>(pThis) + offset);
         if (json.HasMember(key)) {
-            dest = adapter<T,typename GenericType::EncodingType,typename GenericType::AllocatorType>::get(json[key]);
+            dest = adapter<T,Encoding,Allocator>::get(json[key]);
             return  true;
         }
         return false;
@@ -221,6 +222,7 @@ struct transform<T,std::enable_if_t<std::is_integral_v<T>>>
     
     static  void to_json(const char*key,rapidjson::Value &value,rapidjson::Document::AllocatorType &allocator,void*pThis,OffsetType offset)
     {
+        using GenericType = std::decay_t<decltype(value)>;
         if (key == nullptr) {///array
             auto && dest = *reinterpret_cast<Type*>(pThis);
             value.SetInt(dest);
