@@ -223,7 +223,8 @@ std::string transform_to_json(void *pThis,const ReflectMapType &reflect_map)
 #define DECLARE__JSON__AUTO__TRANSFORM  \
 const static auto_json::ReflectMapType reflect_map;  \
 inline bool transform_from_json(const std::string &json){return auto_json::transform_from_json(this, reflect_map, json);}\
-inline bool transform_from_json(const auto_json::JsonLocation &json){return auto_json::transform_from_json(this, reflect_map, json);}
+inline bool transform_from_json(const auto_json::JsonLocation &json){return auto_json::transform_from_json(this, reflect_map, json);}\
+inline std::string transform_to_json(){return auto_json::transform_to_json(this, reflect_map);}
 
 
 #ifdef _MSC_VER ///VS2015

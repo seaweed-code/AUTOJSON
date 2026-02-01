@@ -17,6 +17,7 @@ struct AA
 struct JOSONODEL {
     int a{};
     double b{};
+    //float b0000{};
     std::string url;
     std::string name;
     std::vector<int> dd;
