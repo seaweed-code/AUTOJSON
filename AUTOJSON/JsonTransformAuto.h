@@ -95,10 +95,8 @@ struct transform<bool>
 {
     static  bool from_json(const char*key,const JsonLocation &json,void*pThis,OffsetType offset)
     {
-        if (key == nullptr) {///array
-            auto && dest = *reinterpret_cast<bool*>(pThis);
-            dest = json[static_cast<int>(offset)].GetBool();
-            return true;
+        if (key == nullptr) {///unsupport
+            return  false;
         }
         if (json.HasMember(key)) {
             auto && dest = *reinterpret_cast<bool*>(static_cast<char*>(pThis) + offset);
@@ -114,6 +112,11 @@ struct transform<int>
 {
     static  bool from_json(const char*key,const JsonLocation &json,void*pThis,OffsetType offset)
     {
+        if (key == nullptr) {///array
+            auto && dest = *reinterpret_cast<int*>(pThis);
+            dest = json[static_cast<int>(offset)].GetInt();
+            return true;
+        }
         auto && dest = *reinterpret_cast<int*>(static_cast<char*>(pThis) + offset);
         if (json.HasMember(key)) {
             dest =   json[key].GetInt();

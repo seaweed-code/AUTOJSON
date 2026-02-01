@@ -19,6 +19,8 @@ struct JOSONODEL {
     std::string name;
     std::vector<int> dd;
     
+    std::vector<int> boosaa;
+    
     int id{};
     int a3{};
     int a4{};
@@ -33,11 +35,11 @@ struct JOSONODEL {
     DECLARE__JSON__AUTO__TRANSFORM
 };
 
-IMPLEMENT__JSON__AUTO__TRANSFORM(JOSONODEL,a,b,url,dd,name,id,a3,a4,a5,a6,aaa000,custom)
+IMPLEMENT__JSON__AUTO__TRANSFORM(JOSONODEL,a,b,url,dd,name,id,a3,a4,a5,a6,aaa000,custom,boosaa)
 IMPLEMENT__JSON__AUTO__TRANSFORM(AA,aa)
 
 int main(int argc, const char * argv[]) {
-    std::string json = "{\"id\": 1,    \"name\": \"mmahew\",    \"url\": \"www.runoob.com\"}";
+    std::string json = "{\"id\": 1,    \"name\": \"mmahew\",  \"boosaa\": [88, 99, 800],  \"url\": \"www.runoob.com\"}";
     
     JOSONODEL aa;
     
