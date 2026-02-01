@@ -132,8 +132,14 @@ struct transform<double>
 {
     static  bool from_json(const char*key,const JsonLocation &json,void*pThis,OffsetType offset)
     {
-        auto && dest = *reinterpret_cast<double*>(static_cast<char*>(pThis) + offset);
+        if (key == nullptr) {///array
+            auto && dest = *reinterpret_cast<double*>(pThis);
+            dest = json[static_cast<int>(offset)].GetDouble();
+            return true;
+        }
+       
         if (json.HasMember(key)) {
+            auto && dest = *reinterpret_cast<double*>(static_cast<char*>(pThis) + offset);
             dest =   json[key].GetDouble();
             return  true;
         }
