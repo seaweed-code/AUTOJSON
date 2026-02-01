@@ -59,10 +59,11 @@ struct transform<bool>
     static  bool from_json(const char*key,const JsonLocation &json,void*pThis,OffsetType offset)
     {
         auto && dest = *reinterpret_cast<bool*>(static_cast<char*>(pThis) + offset);
-        dest = true;
-        //int *pDest = (int*)(((char*)pThis) + offset);
-       // std::cout << key << "--bool-" << json << "---"  << pThis  << "--"  << offset   << std::endl;
-        return true;
+        if (json.HasMember(key)) {
+            dest =   json[key].GetBool();
+            return  true;
+        }
+        return false;
     }
 };
 
@@ -72,10 +73,11 @@ struct transform<int>
     static  bool from_json(const char*key,const JsonLocation &json,void*pThis,OffsetType offset)
     {
         auto && dest = *reinterpret_cast<int*>(static_cast<char*>(pThis) + offset);
-        dest = 1;
-        //int *pDest = (int*)(((char*)pThis) + offset);
-       // std::cout << key << "--int-" << json << "---"  << pThis  << "--"  << offset   << std::endl;
-        return true;
+        if (json.HasMember(key)) {
+            dest =   json[key].GetInt();
+            return  true;
+        }
+        return false;
     }
 };
 
