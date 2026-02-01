@@ -51,6 +51,20 @@ struct  adapter<int,Encoding,Allocator>
     inline static void set(rapidjson::GenericValue<Encoding,Allocator>&value,int newValue){return value.SetInt(newValue);}
 };
 
+template <typename Encoding, typename Allocator>
+struct  adapter<int64_t,Encoding,Allocator>
+{
+   inline static int64_t get(rapidjson::GenericValue<Encoding,Allocator>&value)  {return value.GetInt64();}
+    inline static void set(rapidjson::GenericValue<Encoding,Allocator>&value,int64_t newValue){return value.SetInt64(newValue);}
+};
+
+template <typename Encoding, typename Allocator>
+struct  adapter<bool,Encoding,Allocator>
+{
+   inline static bool get(rapidjson::GenericValue<Encoding,Allocator>&value)  {return value.GetBool();}
+    inline static void set(rapidjson::GenericValue<Encoding,Allocator>&value,bool newValue){return value.SetBool(newValue);}
+};
+
 template <typename  T,typename Enable = void>
 struct transform;
 
