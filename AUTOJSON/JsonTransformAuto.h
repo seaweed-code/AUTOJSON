@@ -38,12 +38,13 @@ struct transform;
 template <typename  T>
 struct transform<T,std::enable_if_t<std::is_same_v<decltype(T::reflect_map),const ReflectMapType>>>
 {
+    using Type = T;
     static  bool from_json(const char*key,const JsonLocation &json,void*pThis,OffsetType offset)
     {
         if (key == nullptr) {///array
             auto&& obj = json[static_cast<int>(offset)];
             if (obj.IsObject()) {
-                auto && dest = *reinterpret_cast<T*>(pThis);
+                auto && dest = *reinterpret_cast<Type*>(pThis);
                 return  dest.transform_from_json(obj);
             }
             return false;
@@ -51,30 +52,18 @@ struct transform<T,std::enable_if_t<std::is_same_v<decltype(T::reflect_map),cons
         if (json.HasMember(key)) {
             auto&& obj = json[key];
             if (obj.IsObject()) {
-                auto && dest = *reinterpret_cast<T*>(static_cast<char*>(pThis) + offset);
+                auto && dest = *reinterpret_cast<Type*>(static_cast<char*>(pThis) + offset);
                 return  dest.transform_from_json(obj);
             }
         }
         return false;
     }
     
-    static  void to_json(const char*key,rapidjson::Document &doc,void*pThis,OffsetType offset)
+    static  void to_json(const char*key,rapidjson::Value &value,rapidjson::Document::AllocatorType &allocator,void*pThis,OffsetType offset)
     {
-        auto&& allocator = doc.GetAllocator();
-        /*
         auto && dest = *reinterpret_cast<Type*>(static_cast<char*>(pThis) +  offset);
-        rapidjson::Value k;
-        k.SetString(key, allocator);
-
-        rapidjson::Value v;
-        v.SetBool(dest);
-        doc.AddMember(k, v, allocator);
-        
-        rapidjson::Value locationObj(rapidjson::kObjectType);//创建一个Object类型的元素
-            locationObj.AddMember("province", "fujian", allocator);
-            locationObj.AddMember("city", "xiamen", allocator);
-            locationObj.AddMember("number", 16, allocator);
-            jsonDoc.AddMember("location", locationObj, allocator);*/
+        rapidjson::Value locationObj(rapidjson::kObjectType);
+        dest.transform_to_json(value,allocator);
     }
 };
 
@@ -321,7 +310,8 @@ std::string transform_to_json(void *pThis,const ReflectMapType &reflect_map)
 const static auto_json::ReflectMapType reflect_map;  \
 inline bool transform_from_json(const std::string &json){return auto_json::transform_from_json(this, reflect_map, json);}\
 inline bool transform_from_json(const auto_json::JsonLocation &json){return auto_json::transform_from_json(this, reflect_map, json);}\
-inline std::string transform_to_json(){return auto_json::transform_to_json(this, reflect_map);}
+inline std::string transform_to_json(){return auto_json::transform_to_json(this, reflect_map);}\
+inline void transform_to_json(rapidjson::Value &value,rapidjson::Document::AllocatorType &allocator){auto_json::transform_to_json(this, value,allocator,reflect_map);}
 
 
 #ifdef _MSC_VER ///VS2015

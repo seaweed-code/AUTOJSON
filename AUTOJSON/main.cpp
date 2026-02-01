@@ -33,6 +33,8 @@ struct JOSONODEL {
     
     std::vector<AA> users;
     
+    
+    
     DECLARE__JSON__AUTO__TRANSFORM
 };
 IMPLEMENT__JSON__AUTO__TRANSFORM(JOSONODEL,id,url,name,score)
