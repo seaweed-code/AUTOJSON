@@ -40,8 +40,8 @@ struct JOSONODEL {
     
     DECLARE__JSON__AUTO__TRANSFORM
 };
-//IMPLEMENT__JSON__AUTO__TRANSFORM(JOSONODEL,id,url,name,score,pppp,intts)
-IMPLEMENT__JSON__AUTO__TRANSFORM(JOSONODEL,a,b,url,dd,name,id,a3,a4,a5,a6,score,aaa000,boosaa,pppp,intts)
+//IMPLEMENT__JSON__AUTO__TRANSFORM(JOSONODEL,users)
+IMPLEMENT__JSON__AUTO__TRANSFORM(JOSONODEL,a,b,url,dd,users,name,id,a3,a4,a5,a6,score,aaa000,boosaa,pppp,intts)
 IMPLEMENT__JSON__AUTO__TRANSFORM(AA,id,name,online)
 
 int main(int argc, const char * argv[]) {

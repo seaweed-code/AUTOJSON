@@ -31,12 +31,22 @@ struct ReflectInfo
 
 using ReflectMapType = std::unordered_map<const char*,ReflectInfo>;
 
+template<typename T>
+using _is_reflect_type_ = std::enable_if_t<std::is_same_v<decltype(T::reflect_map),const ReflectMapType>>;
+
+template <typename  T,typename N = void>
+struct  is_reflect_type:std::false_type{};
+
+template <typename  T>
+struct  is_reflect_type<T,_is_reflect_type_<T>>:std::true_type{};
+
+
 template <typename  T,typename Enable = void>
 struct transform;
 
 
 template <typename  T>
-struct transform<T,std::enable_if_t<std::is_same_v<decltype(T::reflect_map),const ReflectMapType>>>
+struct transform<T,_is_reflect_type_<T>>
 {
     using Type = T;
     static  bool from_json(const char*key,const JsonLocation &json,void*pThis,OffsetType offset)
@@ -102,6 +112,9 @@ struct transform<std::vector<T>>
         for(auto&&element :dest)
         {
             rapidjson::Value e;
+            if (is_reflect_type<T>::value) {
+                e.SetObject();
+            }
             transform<T>::to_json(nullptr,e,allocator,&element,0);
             elements.PushBack(e, allocator);
         }
