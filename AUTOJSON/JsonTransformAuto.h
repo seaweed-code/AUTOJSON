@@ -48,7 +48,7 @@ template <typename Encoding, typename Allocator>
 struct  adapter<int,Encoding,Allocator>
 {
     using Type = int;
-    inline static Type get(rapidjson::GenericValue<Encoding,Allocator>&value)  {return value.GetInt();}
+    inline static Type get(const rapidjson::GenericValue<Encoding,Allocator>&value)  {return value.GetInt();}
     inline static void set(rapidjson::GenericValue<Encoding,Allocator>&value,Type newValue){return value.SetInt(newValue);}
 };
 
@@ -56,28 +56,28 @@ template <typename Encoding, typename Allocator>
 struct  adapter<int64_t,Encoding,Allocator>
 {
     using Type = int64_t;
-   inline static Type get(rapidjson::GenericValue<Encoding,Allocator>&value)  {return value.GetInt64();}
+   inline static Type get(const rapidjson::GenericValue<Encoding,Allocator>&value)  {return value.GetInt64();}
     inline static void set(rapidjson::GenericValue<Encoding,Allocator>&value,Type newValue){return value.SetInt64(newValue);}
 };
 template <typename Encoding, typename Allocator>
 struct  adapter<double,Encoding,Allocator>
 {
     using Type = double;
-   inline static Type get(rapidjson::GenericValue<Encoding,Allocator>&value)  {return value.GetDouble();}
+   inline static Type get(const rapidjson::GenericValue<Encoding,Allocator>&value)  {return value.GetDouble();}
     inline static void set(rapidjson::GenericValue<Encoding,Allocator>&value,Type newValue){return value.SetDouble(newValue);}
 };
 template <typename Encoding, typename Allocator>
 struct  adapter<float,Encoding,Allocator>
 {
     using Type = float;
-   inline static Type get(rapidjson::GenericValue<Encoding,Allocator>&value)  {return value.GetFloat();}
+   inline static Type get(const rapidjson::GenericValue<Encoding,Allocator>&value)  {return value.GetFloat();}
     inline static void set(rapidjson::GenericValue<Encoding,Allocator>&value,Type newValue){return value.SetFloat(newValue);}
 };
 template <typename Encoding, typename Allocator>
 struct  adapter<bool,Encoding,Allocator>
 {
     using Type = bool;
-    inline static Type get(rapidjson::GenericValue<Encoding,Allocator>&value)  {return value.GetBool();}
+    inline static Type get(const rapidjson::GenericValue<Encoding,Allocator>&value)  {return value.GetBool();}
     inline static void set(rapidjson::GenericValue<Encoding,Allocator>&value,Type newValue){return value.SetBool(newValue);}
 };
 
@@ -198,15 +198,17 @@ struct transform<bool>
     }
 };
 
-template <>
-struct transform<int>
+
+template <typename  T>
+struct transform<T,std::enable_if_t<std::is_integral_v<T>>>
 {
-    using Type = int;
+    using Type = T;
     static  bool from_json(const char*key,const JsonLocation &json,void*pThis,OffsetType offset)
     {
         if (key == nullptr) {///array
             auto && dest = *reinterpret_cast<Type*>(pThis);
-            dest = json[static_cast<int>(offset)].GetInt();
+            using GenericType = std::decay_t<decltype(json[0])>;
+            dest = adapter<T,typename GenericType::EncodingType,typename GenericType::AllocatorType>::get(json[static_cast<int>(offset)]);
             return true;
         }
         auto && dest = *reinterpret_cast<Type*>(static_cast<char*>(pThis) + offset);
