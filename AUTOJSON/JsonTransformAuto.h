@@ -158,6 +158,18 @@ struct transform<std::string>
         }
         return false;
     }
+    
+    static  void to_json(const char*key,rapidjson::Document &doc,void*pThis,OffsetType offset)
+    {
+        auto&& allocator = doc.GetAllocator();
+        auto && dest = *reinterpret_cast<std::string*>(static_cast<char*>(pThis) +  offset);
+        rapidjson::Value k;
+        k.SetString(key, allocator);
+
+        rapidjson::Value v;
+        v.SetString(dest.c_str(), allocator);
+        doc.AddMember(k, v, allocator);
+    }
 };
 
 
@@ -201,12 +213,14 @@ std::string transform_to_json(void *pThis,const ReflectMapType &reflect_map)
     rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
     doc.Accept(writer);
     return  buffer.GetString();
+    
+    
 }
 
 };
 
 
-#define __ADD__JSON__KEY__1(C,_1)  {#_1,{offsetof(C, _1),(auto_json::pFuncParse)auto_json::transform<decltype(C::_1)>::from_json}},
+#define __ADD__JSON__KEY__1(C,_1)  {#_1,{offsetof(C, _1),(auto_json::pFuncParse)auto_json::transform<decltype(C::_1)>::from_json,(auto_json::pFuncParseToJson)auto_json::transform<decltype(C::_1)>::to_json}},
 #define __ADD__JSON__KEY__2(C,_1,_2)      __ADD__JSON__KEY__1(C,_1) __ADD__JSON__KEY__1(C,_2)
 #define __ADD__JSON__KEY__3(C,_1,_2,_3)   __ADD__JSON__KEY__2(C,_1,_2) __ADD__JSON__KEY__1(C,_3)
 #define __ADD__JSON__KEY__4(C,_1,_2,_3,_4)   __ADD__JSON__KEY__3(C,_1,_2,_3) __ADD__JSON__KEY__1(C,_4)
