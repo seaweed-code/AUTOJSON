@@ -244,6 +244,11 @@ struct transform<std::string>
     
     static  void to_json(const char*key,rapidjson::Value &value,rapidjson::Document::AllocatorType &allocator,void*pThis,OffsetType offset)
     {
+        if (key == nullptr) {///array
+            auto && dest = *reinterpret_cast<Type*>(pThis);
+            value.SetString(dest.c_str(),allocator);
+            return;
+        }
         auto && dest = *reinterpret_cast<Type*>(static_cast<char*>(pThis) +  offset);
         rapidjson::Value k;
         k.SetString(key, allocator);
