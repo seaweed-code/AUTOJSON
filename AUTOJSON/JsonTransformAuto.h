@@ -213,8 +213,6 @@ std::string transform_to_json(void *pThis,const ReflectMapType &reflect_map)
     rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
     doc.Accept(writer);
     return  buffer.GetString();
-    
-    
 }
 
 };
