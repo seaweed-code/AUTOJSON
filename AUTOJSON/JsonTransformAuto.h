@@ -21,7 +21,14 @@ using JsonLocation = rapidjson::Value;
 using OffsetType = size_t;
 using pFuncParse = bool(*)(const char*key,const JsonLocation &json,void*pThis,OffsetType offset);
 
-using ReflectMapType = std::unordered_map<const char*,std::pair<OffsetType,pFuncParse>>;
+struct ReflectInfo
+{
+    
+    OffsetType offset;
+    pFuncParse from_json;
+};
+
+using ReflectMapType = std::unordered_map<const char*,ReflectInfo>;
 
 template <typename  T,typename Enable = void>
 struct transform;
@@ -159,7 +166,7 @@ bool transform_from_json(void *pThis,const ReflectMapType &reflect_map ,const Js
     unsigned int total{};
     for (auto&& p:reflect_map)
     {
-       auto success =  p.second.second(p.first,json,pThis,p.second.first);
+       auto success =  p.second.from_json(p.first,json,pThis,p.second.offset);
         if (!success)
         {
             total ++;
