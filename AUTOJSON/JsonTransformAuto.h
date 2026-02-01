@@ -14,6 +14,7 @@
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
+#include "rapidjson/error/en.h"
 
 namespace auto_json {
 using JsonLocation = rapidjson::Value;
@@ -160,6 +161,7 @@ bool transform_from_json(void *pThis,const ReflectMapType &reflect_map ,const st
     rapidjson::ParseResult ok = doc.Parse(json.c_str());
     if (!ok) 
     {
+        printf("Parse Json Error: %s at %zu\n",rapidjson::GetParseError_En(ok.Code()),ok.Offset());
         return  false;
     }
     rapidjson::Value& root = doc;
