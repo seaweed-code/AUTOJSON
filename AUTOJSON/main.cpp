@@ -19,7 +19,7 @@ struct JOSONODEL {
     std::string name;
     std::vector<int> dd;
     
-    std::vector<int> boosaa;
+    std::vector<std::string> boosaa;
     
     int id{};
     int a3{};
@@ -39,7 +39,7 @@ IMPLEMENT__JSON__AUTO__TRANSFORM(JOSONODEL,a,b,url,dd,name,id,a3,a4,a5,a6,aaa000
 IMPLEMENT__JSON__AUTO__TRANSFORM(AA,aa)
 
 int main(int argc, const char * argv[]) {
-    std::string json = "{\"id\": 1,    \"name\": \"mmahew\",  \"boosaa\": [88, 99, 800],  \"url\": \"www.runoob.com\"}";
+    std::string json = "{\"id\": 1,    \"name\": \"mmahew\",  \"boosaa\": [\"---8.8\", \"ppp9.9\", \"kkk0.800\"],  \"url\": \"www.runoob.com\"}";
     
     JOSONODEL aa;
     

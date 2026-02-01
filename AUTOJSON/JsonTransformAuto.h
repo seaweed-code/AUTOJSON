@@ -153,8 +153,14 @@ struct transform<std::string>
 {
     static  bool from_json(const char*key,const JsonLocation &json,void*pThis,OffsetType offset)
     {
-        auto && dest = *reinterpret_cast<std::string*>(static_cast<char*>(pThis) +  offset);
+        if (key == nullptr) {///array
+            auto && dest = *reinterpret_cast<std::string*>(pThis);
+            dest = json[static_cast<int>(offset)].GetString();
+            return true;
+        }
+      
         if (json.HasMember(key)) {
+            auto && dest = *reinterpret_cast<std::string*>(static_cast<char*>(pThis) +  offset);
             dest =   json[key].GetString();
             return  true;
         }
