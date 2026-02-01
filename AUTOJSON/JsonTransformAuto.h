@@ -157,7 +157,11 @@ bool transform_from_json(void *pThis,const ReflectMapType &reflect_map ,const Js
 bool transform_from_json(void *pThis,const ReflectMapType &reflect_map ,const std::string& json)
 {
     rapidjson::Document doc;
-    doc.Parse(json.c_str());
+    rapidjson::ParseResult ok = doc.Parse(json.c_str());
+    if (!ok) 
+    {
+        return  false;
+    }
     rapidjson::Value& root = doc;
     return transform_from_json(pThis, reflect_map, root);
 }
