@@ -31,8 +31,14 @@ struct transform<T,std::enable_if_t<std::is_same_v<decltype(T::reflect_map),cons
 {
     static  bool from_json(const char*key,const JsonLocation &json,void*pThis,OffsetType offset)
     {
-        //std::cout << key << "--customeClass-" << json << "---"  << pThis  << "--"  << offset   << std::endl;
-        return true;
+        if (json.HasMember(key)) {
+            auto&& obj = json[key];
+            if (obj.IsObject()) {
+                
+                return  true;
+            }
+        }
+        return false;
     }
 };
 
