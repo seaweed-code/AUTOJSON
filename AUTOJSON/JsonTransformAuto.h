@@ -61,6 +61,12 @@ struct transform<T,std::enable_if_t<std::is_same_v<decltype(T::reflect_map),cons
     
     static  void to_json(const char*key,rapidjson::Value &value,rapidjson::Document::AllocatorType &allocator,void*pThis,OffsetType offset)
     {
+        if (key == nullptr) {///array
+            auto && dest = *reinterpret_cast<Type*>(pThis);
+            
+           // dest = json[static_cast<int>(offset)].GetInt();
+            return;
+        }
         auto && dest = *reinterpret_cast<Type*>(static_cast<char*>(pThis) +  offset);
         rapidjson::Value obj(rapidjson::kObjectType);
         dest.transform_to_json(obj,allocator);
@@ -96,7 +102,9 @@ struct transform<std::vector<T>>
         rapidjson::Value elements(rapidjson::kArrayType);//创建一个Array类型的元素
         for(auto&&element :dest)
         {
-            //elements.PushBack("a", allocator);
+            rapidjson::Value e;
+            transform<T>::to_json(nullptr,e,allocator,&element,0);
+            elements.PushBack(e, allocator);
         }
         rapidjson::Value k;
         k.SetString(key, allocator);
@@ -124,6 +132,10 @@ struct transform<bool>
     
     static  void to_json(const char*key,rapidjson::Value &value,rapidjson::Document::AllocatorType &allocator,void*pThis,OffsetType offset)
     {
+        if (key == nullptr) {///array
+            printf("std::vector<bool> is not supported \n");
+            return;
+        }
         auto && dest = *reinterpret_cast<Type*>(static_cast<char*>(pThis) +  offset);
         rapidjson::Value k;
         k.SetString(key, allocator);
@@ -155,6 +167,12 @@ struct transform<int>
     
     static  void to_json(const char*key,rapidjson::Value &value,rapidjson::Document::AllocatorType &allocator,void*pThis,OffsetType offset)
     {
+        if (key == nullptr) {///array
+            auto && dest = *reinterpret_cast<Type*>(pThis);
+            value.SetInt(dest);
+            return;
+        }
+
         auto && dest = *reinterpret_cast<Type*>(static_cast<char*>(pThis) +  offset);
         rapidjson::Value k;
         k.SetString(key, allocator);

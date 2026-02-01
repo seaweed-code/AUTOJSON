@@ -34,15 +34,18 @@ struct JOSONODEL {
     std::vector<AA> users;
     
     
+
+    std::vector<int>  intts;
+    
     
     DECLARE__JSON__AUTO__TRANSFORM
 };
-IMPLEMENT__JSON__AUTO__TRANSFORM(JOSONODEL,id,url,name,score,pppp)
+IMPLEMENT__JSON__AUTO__TRANSFORM(JOSONODEL,id,url,name,score,pppp,intts)
 //IMPLEMENT__JSON__AUTO__TRANSFORM(JOSONODEL,a,b,url,dd,name,id,a3,a4,a5,a6,aaa000,users,boosaa)
 IMPLEMENT__JSON__AUTO__TRANSFORM(AA,id,name,online)
 
 int main(int argc, const char * argv[]) {
-    std::string json = "{\"id\": 1, \"pppp\":{ \"id\": 91, \"name\": \"iiuuuu\", \"online\": false }, \"score\": 9.71,    \"name\": \"mmahew\", \"users\": [{ \"id\": 100, \"name\": \"Tom\", \"online\": true },    { \"id\": 101, \"name\": \"Jerry\", \"online\": false } ],  \"boosaa\": [\"---8.8\", \"ppp9.9\", \"kkk0.800\"],  \"url\": \"www.runoob.com\"}";
+    std::string json = "{\"id\": 1, \"intts\":[91, 82, 73, 64, 55], \"pppp\":{ \"id\": 91, \"name\": \"iiuuuu\", \"online\": false }, \"score\": 9.71,    \"name\": \"mmahew\", \"users\": [{ \"id\": 100, \"name\": \"Tom\", \"online\": true },    { \"id\": 101, \"name\": \"Jerry\", \"online\": false } ],  \"boosaa\": [\"---8.8\", \"ppp9.9\", \"kkk0.800\"],  \"url\": \"www.runoob.com\"}";
     
     JOSONODEL aa;
     
