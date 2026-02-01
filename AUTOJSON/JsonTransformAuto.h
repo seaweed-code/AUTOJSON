@@ -92,14 +92,15 @@ struct transform<std::vector<T>>
     }
     static  void to_json(const char*key,rapidjson::Value &value,rapidjson::Document::AllocatorType &allocator,void*pThis,OffsetType offset)
     {
-        /*auto&& allocator = doc.GetAllocator();
         auto && dest = *reinterpret_cast<Type*>(static_cast<char*>(pThis) +  offset);
+        rapidjson::Value elements(rapidjson::kArrayType);//创建一个Array类型的元素
+        for(auto&&element :dest)
+        {
+            //elements.PushBack("a", allocator);
+        }
         rapidjson::Value k;
         k.SetString(key, allocator);
-
-        rapidjson::Value v;
-        v.SetBool(dest);
-        doc.AddMember(k, v, allocator);*/
+        value.AddMember(k, elements, allocator);//添加数组
     }
 };
 
