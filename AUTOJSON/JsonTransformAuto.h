@@ -213,7 +213,8 @@ struct transform<T,std::enable_if_t<std::is_integral_v<T>>>
         }
         auto && dest = *reinterpret_cast<Type*>(static_cast<char*>(pThis) + offset);
         if (json.HasMember(key)) {
-            dest =   json[key].GetInt();
+            using GenericType = std::decay_t<decltype(json[key])>;
+            dest = adapter<T,typename GenericType::EncodingType,typename GenericType::AllocatorType>::get(json[key]);
             return  true;
         }
         return false;
