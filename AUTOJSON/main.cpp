@@ -39,9 +39,6 @@ IMPLEMENT__JSON__AUTO__TRANSFORM(AA,aa)
 int main(int argc, const char * argv[]) {
     std::string json = "{\"id\": 1,    \"name\": \"mmahew\",    \"url\": \"www.runoob.com\"}";
     
-  //  auto aa00 = auto_json::HasReflectType<AA>::value;
-    //auto bb = auto_json::HasReflectType<JOSONODEL>::value;
-    
     JOSONODEL aa;
     
     aa.transform_from_json(json);
