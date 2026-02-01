@@ -27,6 +27,9 @@ struct JOSONODEL {
     bool aaa000;
     
     AA custom;
+    
+    
+    
     DECLARE__JSON__AUTO__TRANSFORM
 };
 

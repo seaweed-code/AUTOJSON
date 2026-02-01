@@ -34,7 +34,8 @@ struct transform<T,std::enable_if_t<std::is_same_v<decltype(T::reflect_map),cons
         if (json.HasMember(key)) {
             auto&& obj = json[key];
             if (obj.IsObject()) {
-                
+                auto && dest = *reinterpret_cast<T*>(static_cast<char*>(pThis) + offset);
+               // dest.
                 return  true;
             }
         }
@@ -119,19 +120,24 @@ struct transform<std::string>
 
 
 
-bool transform_from_json(void *pThis,const ReflectMapType &reflect_map ,const std::string& json)
+bool transform_from_json(void *pThis,const ReflectMapType &reflect_map ,const JsonLocation& json)
 {
-    rapidjson::Document doc;
-    doc.Parse(json.c_str());
-    rapidjson::Value& root = doc;
     for (auto&& p:reflect_map)
     {
-       auto success =  p.second.second(p.first,root,pThis,p.second.first);
+       auto success =  p.second.second(p.first,json,pThis,p.second.first);
         if (!success)
         {
         }
     }
     return  true;
+}
+
+bool transform_from_json(void *pThis,const ReflectMapType &reflect_map ,const std::string& json)
+{
+    rapidjson::Document doc;
+    doc.Parse(json.c_str());
+    rapidjson::Value& root = doc;
+    return transform_from_json(pThis, reflect_map, root);
 }
 
 };
@@ -162,7 +168,8 @@ bool transform_from_json(void *pThis,const ReflectMapType &reflect_map ,const st
 
 #define DECLARE__JSON__AUTO__TRANSFORM  \
 const static auto_json::ReflectMapType reflect_map;  \
-inline bool transform_from_json(const std::string &json){return auto_json::transform_from_json(this, reflect_map, json);}
+inline bool transform_from_json(const std::string &json){return auto_json::transform_from_json(this, reflect_map, json);}\
+inline bool transform_from_json(const auto_json::JsonLocation &json){return auto_json::transform_from_json(this, reflect_map, json);}
 
 
 #ifdef _MSC_VER ///VS2015
