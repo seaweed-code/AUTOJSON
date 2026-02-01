@@ -86,9 +86,11 @@ struct transform<double>
     static  bool from_json(const char*key,const JsonLocation &json,void*pThis,OffsetType offset)
     {
         auto && dest = *reinterpret_cast<double*>(static_cast<char*>(pThis) + offset);
-        dest = 9.9;
-        //std::cout << key << "--double-" << json << "---"  << pThis  << "--"  << offset   << std::endl;
-        return true;
+        if (json.HasMember(key)) {
+            dest =   json[key].GetDouble();
+            return  true;
+        }
+        return false;
     }
 };
 
