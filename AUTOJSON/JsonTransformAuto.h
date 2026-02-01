@@ -11,6 +11,9 @@
 #include <unordered_map>
 #include <vector>
 #include <type_traits>
+#include "rapidjson/document.h"
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
 
 namespace auto_json {
 
