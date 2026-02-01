@@ -165,7 +165,7 @@ struct transform<std::vector<T>>
 };
 
 template <typename  T>
-struct transform<T,std::enable_if_t<std::is_integral_v<T> || std::is_floating_point<T>::value>>
+struct transform<T,std::enable_if_t<std::is_integral<T>::value || std::is_floating_point<T>::value>>
 {
     using Type = T;
     using Encoding = typename JsonLocation::EncodingType;
