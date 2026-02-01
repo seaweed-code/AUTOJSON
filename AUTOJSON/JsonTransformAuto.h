@@ -181,6 +181,19 @@ bool transform_from_json(void *pThis,const ReflectMapType &reflect_map ,const st
     return transform_from_json(pThis, reflect_map, root);
 }
 
+std::string transform_to_json(void *pThis,const ReflectMapType &reflect_map)
+{
+    rapidjson::Document doc;
+    doc.SetObject();
+
+    
+    
+    rapidjson::StringBuffer buffer;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+    doc.Accept(writer);
+    return  buffer.GetString();
+}
+
 };
 
 
