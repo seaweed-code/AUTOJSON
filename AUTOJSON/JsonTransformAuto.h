@@ -97,6 +97,18 @@ struct transform<bool>
         }
         return false;
     }
+    
+    static  void to_json(const char*key,rapidjson::Document &doc,void*pThis,OffsetType offset)
+    {
+        auto&& allocator = doc.GetAllocator();
+        auto && dest = *reinterpret_cast<bool*>(static_cast<char*>(pThis) +  offset);
+        rapidjson::Value k;
+        k.SetString(key, allocator);
+
+        rapidjson::Value v;
+        v.SetBool(dest);
+        doc.AddMember(k, v, allocator);
+    }
 };
 
 template <>
