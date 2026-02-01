@@ -57,6 +57,25 @@ struct transform<T,std::enable_if_t<std::is_same_v<decltype(T::reflect_map),cons
         }
         return false;
     }
+    
+    static  void to_json(const char*key,rapidjson::Document &doc,void*pThis,OffsetType offset)
+    {
+        auto&& allocator = doc.GetAllocator();
+        /*
+        auto && dest = *reinterpret_cast<Type*>(static_cast<char*>(pThis) +  offset);
+        rapidjson::Value k;
+        k.SetString(key, allocator);
+
+        rapidjson::Value v;
+        v.SetBool(dest);
+        doc.AddMember(k, v, allocator);
+        
+        rapidjson::Value locationObj(rapidjson::kObjectType);//创建一个Object类型的元素
+            locationObj.AddMember("province", "fujian", allocator);
+            locationObj.AddMember("city", "xiamen", allocator);
+            locationObj.AddMember("number", 16, allocator);
+            jsonDoc.AddMember("location", locationObj, allocator);*/
+    }
 };
 
 
@@ -78,6 +97,17 @@ struct transform<std::vector<T>>
             }
         }
         return false;
+    }
+    static  void to_json(const char*key,rapidjson::Document &doc,void*pThis,OffsetType offset)
+    {
+        /*auto&& allocator = doc.GetAllocator();
+        auto && dest = *reinterpret_cast<Type*>(static_cast<char*>(pThis) +  offset);
+        rapidjson::Value k;
+        k.SetString(key, allocator);
+
+        rapidjson::Value v;
+        v.SetBool(dest);
+        doc.AddMember(k, v, allocator);*/
     }
 };
 
@@ -241,14 +271,19 @@ bool transform_from_json(void *pThis,const ReflectMapType &reflect_map ,const st
     return transform_from_json(pThis, reflect_map, root);
 }
 
-std::string transform_to_json(void *pThis,const ReflectMapType &reflect_map)
+void transform_to_json(void *pThis,rapidjson::Document &doc,const ReflectMapType &reflect_map)
 {
-    rapidjson::Document doc;
-    doc.SetObject();
     for (auto&& p:reflect_map)
     {
         p.second.to_json(p.first,doc,pThis,p.second.offset);
     }
+}
+
+std::string transform_to_json(void *pThis,const ReflectMapType &reflect_map)
+{
+    rapidjson::Document doc;
+    doc.SetObject();
+    transform_to_json(pThis, doc, reflect_map);
     rapidjson::StringBuffer buffer;
     rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
     doc.Accept(writer);
