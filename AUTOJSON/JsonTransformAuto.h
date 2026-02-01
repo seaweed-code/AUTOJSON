@@ -96,6 +96,7 @@ struct transform<bool>
     static  bool from_json(const char*key,const JsonLocation &json,void*pThis,OffsetType offset)
     {
         if (key == nullptr) {///unsupport
+            printf("std::vector<bool> is not supported \n");
             return  false;
         }
         if (json.HasMember(key)) {
