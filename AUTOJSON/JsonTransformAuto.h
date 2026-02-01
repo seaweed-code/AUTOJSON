@@ -87,7 +87,7 @@ struct transform<std::vector<T>>
         }
         return false;
     }
-    static  void to_json(const char*key,rapidjson::Document &doc,void*pThis,OffsetType offset)
+    static  void to_json(const char*key,rapidjson::Value &value,rapidjson::Document::AllocatorType &allocator,void*pThis,OffsetType offset)
     {
         /*auto&& allocator = doc.GetAllocator();
         auto && dest = *reinterpret_cast<Type*>(static_cast<char*>(pThis) +  offset);
@@ -118,16 +118,15 @@ struct transform<bool>
         return false;
     }
     
-    static  void to_json(const char*key,rapidjson::Document &doc,void*pThis,OffsetType offset)
+    static  void to_json(const char*key,rapidjson::Value &value,rapidjson::Document::AllocatorType &allocator,void*pThis,OffsetType offset)
     {
-        auto&& allocator = doc.GetAllocator();
         auto && dest = *reinterpret_cast<Type*>(static_cast<char*>(pThis) +  offset);
         rapidjson::Value k;
         k.SetString(key, allocator);
 
         rapidjson::Value v;
         v.SetBool(dest);
-        doc.AddMember(k, v, allocator);
+        value.AddMember(k, v, allocator);
     }
 };
 
@@ -150,16 +149,15 @@ struct transform<int>
         return false;
     }
     
-    static  void to_json(const char*key,rapidjson::Document &doc,void*pThis,OffsetType offset)
+    static  void to_json(const char*key,rapidjson::Value &value,rapidjson::Document::AllocatorType &allocator,void*pThis,OffsetType offset)
     {
-        auto&& allocator = doc.GetAllocator();
         auto && dest = *reinterpret_cast<Type*>(static_cast<char*>(pThis) +  offset);
         rapidjson::Value k;
         k.SetString(key, allocator);
 
         rapidjson::Value v;
         v.SetInt(dest);
-        doc.AddMember(k, v, allocator);
+        value.AddMember(k, v, allocator);
     }
 };
 
@@ -184,16 +182,15 @@ struct transform<double>
         return false;
     }
     
-    static  void to_json(const char*key,rapidjson::Document &doc,void*pThis,OffsetType offset)
+    static  void to_json(const char*key,rapidjson::Value &value,rapidjson::Document::AllocatorType &allocator,void*pThis,OffsetType offset)
     {
-        auto&& allocator = doc.GetAllocator();
         auto && dest = *reinterpret_cast<Type*>(static_cast<char*>(pThis) +  offset);
         rapidjson::Value k;
         k.SetString(key, allocator);
 
         rapidjson::Value v;
         v.SetDouble(dest);
-        doc.AddMember(k, v, allocator);
+        value.AddMember(k, v, allocator);
     }
 };
 
@@ -218,16 +215,15 @@ struct transform<std::string>
         return false;
     }
     
-    static  void to_json(const char*key,rapidjson::Document &doc,void*pThis,OffsetType offset)
+    static  void to_json(const char*key,rapidjson::Value &value,rapidjson::Document::AllocatorType &allocator,void*pThis,OffsetType offset)
     {
-        auto&& allocator = doc.GetAllocator();
         auto && dest = *reinterpret_cast<Type*>(static_cast<char*>(pThis) +  offset);
         rapidjson::Value k;
         k.SetString(key, allocator);
 
         rapidjson::Value v;
         v.SetString(dest.c_str(), allocator);
-        doc.AddMember(k, v, allocator);
+        value.AddMember(k, v, allocator);
     }
 };
 
