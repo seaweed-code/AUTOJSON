@@ -16,9 +16,9 @@
 #include "rapidjson/stringbuffer.h"
 
 namespace auto_json {
-
+using JsonLocation = rapidjson::Value;
 using OffsetType = size_t;
-using pFuncParse = bool(*)(const char*key,const std::string &json,void*pThis,OffsetType offset);
+using pFuncParse = bool(*)(const char*key,const JsonLocation &json,void*pThis,OffsetType offset);
 
 using ReflectMapType = std::unordered_map<const char*,std::pair<OffsetType,pFuncParse>>;
 
@@ -29,9 +29,9 @@ struct transform;
 template <typename  T>
 struct transform<T,std::enable_if_t<std::is_same_v<decltype(T::reflect_map),const ReflectMapType>>>
 {
-    static  bool from_json(const char*key,const std::string &json,void*pThis,OffsetType offset)
+    static  bool from_json(const char*key,const JsonLocation &json,void*pThis,OffsetType offset)
     {
-        std::cout << key << "--customeClass-" << json << "---"  << pThis  << "--"  << offset   << std::endl;
+        //std::cout << key << "--customeClass-" << json << "---"  << pThis  << "--"  << offset   << std::endl;
         return true;
     }
 };
@@ -40,7 +40,7 @@ template <typename  T>
 struct transform<std::vector<T>>
 {
     using Type = std::vector<T>;
-    static  bool from_json(const char*key,const std::string &json,void*pThis,OffsetType offset)
+    static  bool from_json(const char*key,const JsonLocation &json,void*pThis,OffsetType offset)
     {
         auto && dest = *reinterpret_cast<Type*>(static_cast<char*>(pThis) + offset);
        
@@ -48,7 +48,7 @@ struct transform<std::vector<T>>
             dest.push_back(T{});
         }
         
-        std::cout << key << "--bool-" << json << "---"  << pThis  << "--"  << offset   << std::endl;
+       // std::cout << key << "--bool-" << json << "---"  << pThis  << "--"  << offset   << std::endl;
         return true;
     }
 };
@@ -56,12 +56,12 @@ struct transform<std::vector<T>>
 template <>
 struct transform<bool>
 {
-    static  bool from_json(const char*key,const std::string &json,void*pThis,OffsetType offset)
+    static  bool from_json(const char*key,const JsonLocation &json,void*pThis,OffsetType offset)
     {
         auto && dest = *reinterpret_cast<bool*>(static_cast<char*>(pThis) + offset);
         dest = true;
         //int *pDest = (int*)(((char*)pThis) + offset);
-        std::cout << key << "--bool-" << json << "---"  << pThis  << "--"  << offset   << std::endl;
+       // std::cout << key << "--bool-" << json << "---"  << pThis  << "--"  << offset   << std::endl;
         return true;
     }
 };
@@ -69,12 +69,12 @@ struct transform<bool>
 template <>
 struct transform<int>
 {
-    static  bool from_json(const char*key,const std::string &json,void*pThis,OffsetType offset)
+    static  bool from_json(const char*key,const JsonLocation &json,void*pThis,OffsetType offset)
     {
         auto && dest = *reinterpret_cast<int*>(static_cast<char*>(pThis) + offset);
         dest = 1;
         //int *pDest = (int*)(((char*)pThis) + offset);
-        std::cout << key << "--int-" << json << "---"  << pThis  << "--"  << offset   << std::endl;
+       // std::cout << key << "--int-" << json << "---"  << pThis  << "--"  << offset   << std::endl;
         return true;
     }
 };
@@ -83,11 +83,11 @@ struct transform<int>
 template <>
 struct transform<double>
 {
-    static  bool from_json(const char*key,const std::string &json,void*pThis,OffsetType offset)
+    static  bool from_json(const char*key,const JsonLocation &json,void*pThis,OffsetType offset)
     {
         auto && dest = *reinterpret_cast<double*>(static_cast<char*>(pThis) + offset);
         dest = 9.9;
-        std::cout << key << "--double-" << json << "---"  << pThis  << "--"  << offset   << std::endl;
+        //std::cout << key << "--double-" << json << "---"  << pThis  << "--"  << offset   << std::endl;
         return true;
     }
 };
@@ -96,11 +96,11 @@ struct transform<double>
 template <>
 struct transform<std::string>
 {
-    static  bool from_json(const char*key,const std::string &json,void*pThis,OffsetType offset)
+    static  bool from_json(const char*key,const JsonLocation &json,void*pThis,OffsetType offset)
     {
         auto && dest = *reinterpret_cast<std::string*>(static_cast<char*>(pThis) +  offset);
         dest = "9099009llkk";
-        std::cout << key << "-string--" << json << "---"  << pThis  << "--"  << offset   << std::endl;
+       // std::cout << key << "-string--" << json << "---"  << pThis  << "--"  << offset   << std::endl;
         return true;
     }
 };
@@ -114,7 +114,7 @@ bool transform_from_json(void *pThis,const ReflectMapType &reflect_map ,const st
     rapidjson::Value& root = doc;
     for (auto&& p:reflect_map)
     {
-       auto success =  p.second.second(p.first,json,pThis,p.second.first);
+       auto success =  p.second.second(p.first,root,pThis,p.second.first);
         if (!success)
         {
         }
