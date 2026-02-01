@@ -107,8 +107,11 @@ struct transform<std::string>
 
 
 
-bool transform_from_json(void *pThis,const ReflectMapType &reflect_map ,const std::string&json)
+bool transform_from_json(void *pThis,const ReflectMapType &reflect_map ,const std::string& json)
 {
+    rapidjson::Document doc;
+    doc.Parse(json.c_str());
+    rapidjson::Value& root = doc;
     for (auto&& p:reflect_map)
     {
        auto success =  p.second.second(p.first,json,pThis,p.second.first);
