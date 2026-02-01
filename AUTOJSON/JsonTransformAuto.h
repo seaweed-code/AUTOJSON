@@ -62,8 +62,11 @@ struct transform<T,std::enable_if_t<std::is_same_v<decltype(T::reflect_map),cons
     static  void to_json(const char*key,rapidjson::Value &value,rapidjson::Document::AllocatorType &allocator,void*pThis,OffsetType offset)
     {
         auto && dest = *reinterpret_cast<Type*>(static_cast<char*>(pThis) +  offset);
-        rapidjson::Value locationObj(rapidjson::kObjectType);
-        dest.transform_to_json(value,allocator);
+        rapidjson::Value obj(rapidjson::kObjectType);
+        dest.transform_to_json(obj,allocator);
+        rapidjson::Value k;
+        k.SetString(key, allocator);
+        value.AddMember(k, obj, allocator);
     }
 };
 
