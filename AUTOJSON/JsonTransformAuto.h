@@ -116,6 +116,18 @@ struct transform<int>
         }
         return false;
     }
+    
+    static  void to_json(const char*key,rapidjson::Document &doc,void*pThis,OffsetType offset)
+    {
+        auto&& allocator = doc.GetAllocator();
+        auto && dest = *reinterpret_cast<int*>(static_cast<char*>(pThis) +  offset);
+        rapidjson::Value k;
+        k.SetString(key, allocator);
+
+        rapidjson::Value v;
+        v.SetInt(dest);
+        doc.AddMember(k, v, allocator);
+    }
 };
 
 
@@ -136,6 +148,18 @@ struct transform<double>
             return  true;
         }
         return false;
+    }
+    
+    static  void to_json(const char*key,rapidjson::Document &doc,void*pThis,OffsetType offset)
+    {
+        auto&& allocator = doc.GetAllocator();
+        auto && dest = *reinterpret_cast<double*>(static_cast<char*>(pThis) +  offset);
+        rapidjson::Value k;
+        k.SetString(key, allocator);
+
+        rapidjson::Value v;
+        v.SetDouble(dest);
+        doc.AddMember(k, v, allocator);
     }
 };
 
