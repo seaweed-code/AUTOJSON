@@ -15,7 +15,7 @@ struct AA
 struct JOSONODEL {
     int a{};
     double b{};
-    std::string cc;
+    std::string url;
 
     std::vector<int> dd;
     
@@ -30,7 +30,7 @@ struct JOSONODEL {
     DECLARE__JSON__AUTO__TRANSFORM
 };
 
-IMPLEMENT__JSON__AUTO__TRANSFORM(JOSONODEL,a,b,cc,dd,a2,a3,a4,a5,a6,aaa000,custom)
+IMPLEMENT__JSON__AUTO__TRANSFORM(JOSONODEL,a,b,url,dd,a2,a3,a4,a5,a6,aaa000,custom)
 IMPLEMENT__JSON__AUTO__TRANSFORM(AA,aa)
 
 int main(int argc, const char * argv[]) {

@@ -99,9 +99,11 @@ struct transform<std::string>
     static  bool from_json(const char*key,const JsonLocation &json,void*pThis,OffsetType offset)
     {
         auto && dest = *reinterpret_cast<std::string*>(static_cast<char*>(pThis) +  offset);
-        dest = "9099009llkk";
-       // std::cout << key << "-string--" << json << "---"  << pThis  << "--"  << offset   << std::endl;
-        return true;
+        if (json.HasMember(key)) {
+            dest =   json[key].GetString();
+            return  true;
+        }
+        return false;
     }
 };
 
