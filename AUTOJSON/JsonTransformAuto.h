@@ -42,7 +42,7 @@ struct transform<T,std::enable_if_t<std::is_same_v<decltype(T::reflect_map),cons
         return false;
     }
 };
-
+/*
 template <typename  T>
 struct transform<std::vector<T>,std::enable_if_t<std::is_same_v<decltype(T::reflect_map),const ReflectMapType>>>
 {
@@ -67,7 +67,7 @@ struct transform<std::vector<T>,std::enable_if_t<std::is_same_v<decltype(T::refl
         }
         return false;
     }
-};
+};*/
 
 template <typename  T>
 struct transform<std::vector<T>>
@@ -81,7 +81,7 @@ struct transform<std::vector<T>>
                 auto && dest = *reinterpret_cast<Type*>(static_cast<char*>(pThis) + offset);
                 dest.resize(datas.Size());
                 for (int i=0; i<datas.Size(); i++) {
-                    from_json(nullptr,datas, &dest[i],i);
+                   transform<T>::from_json(nullptr,datas, &dest[i],i);
                 }
                 return  true;
             }
@@ -95,8 +95,13 @@ struct transform<bool>
 {
     static  bool from_json(const char*key,const JsonLocation &json,void*pThis,OffsetType offset)
     {
-        auto && dest = *reinterpret_cast<bool*>(static_cast<char*>(pThis) + offset);
+        if (key == nullptr) {///array
+            auto && dest = *reinterpret_cast<bool*>(static_cast<char*>(pThis));
+            dest = json[static_cast<int>(offset)].GetBool();
+            return true;
+        }
         if (json.HasMember(key)) {
+            auto && dest = *reinterpret_cast<bool*>(static_cast<char*>(pThis) + offset);
             dest =   json[key].GetBool();
             return  true;
         }
