@@ -8,7 +8,7 @@
 
 struct AA
 {
-    int id;
+    unsigned id;
     std::string name;
     bool online;
     DECLARE__JSON__AUTO__TRANSFORM
