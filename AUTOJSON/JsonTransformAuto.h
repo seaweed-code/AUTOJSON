@@ -163,44 +163,9 @@ struct transform<std::vector<T>>
         value.AddMember(k, elements, allocator);//添加数组
     }
 };
-/*
-template <>
-struct transform<bool>
-{
-    using Type = bool;
-    static  bool from_json(const char*key,const JsonLocation &json,void*pThis,OffsetType offset)
-    {
-        if (key == nullptr) {///unsupport
-            printf("std::vector<bool> is not supported \n");
-            return  false;
-        }
-        if (json.HasMember(key)) {
-            auto && dest = *reinterpret_cast<Type*>(static_cast<char*>(pThis) + offset);
-            dest =   json[key].GetBool();
-            return  true;
-        }
-        return false;
-    }
-    
-    static  void to_json(const char*key,rapidjson::Value &value,rapidjson::Document::AllocatorType &allocator,void*pThis,OffsetType offset)
-    {
-        if (key == nullptr) {///array
-            printf("std::vector<bool> is not supported \n");
-            return;
-        }
-        auto && dest = *reinterpret_cast<Type*>(static_cast<char*>(pThis) +  offset);
-        rapidjson::Value k;
-        k.SetString(key, allocator);
-
-        rapidjson::Value v;
-        v.SetBool(dest);
-        value.AddMember(k, v, allocator);
-    }
-};*/
-
 
 template <typename  T>
-struct transform<T,std::enable_if_t<std::is_integral_v<T>>>
+struct transform<T,std::enable_if_t<std::is_integral_v<T> || std::is_floating_point_v<T>>>
 {
     using Type = T;
     using Encoding = typename JsonLocation::EncodingType;
@@ -240,42 +205,6 @@ struct transform<T,std::enable_if_t<std::is_integral_v<T>>>
 };
 
 
-template <>
-struct transform<double>
-{
-    using Type = double;
-    static  bool from_json(const char*key,const JsonLocation &json,void*pThis,OffsetType offset)
-    {
-        if (key == nullptr) {///array
-            auto && dest = *reinterpret_cast<Type*>(pThis);
-            dest = json[static_cast<int>(offset)].GetDouble();
-            return true;
-        }
-       
-        if (json.HasMember(key)) {
-            auto && dest = *reinterpret_cast<Type*>(static_cast<char*>(pThis) + offset);
-            dest =   json[key].GetDouble();
-            return  true;
-        }
-        return false;
-    }
-    
-    static  void to_json(const char*key,rapidjson::Value &value,rapidjson::Document::AllocatorType &allocator,void*pThis,OffsetType offset)
-    {
-        if (key == nullptr) {///array
-            auto && dest = *reinterpret_cast<Type*>(pThis);
-            value.SetDouble(dest);
-            return;
-        }
-        auto && dest = *reinterpret_cast<Type*>(static_cast<char*>(pThis) +  offset);
-        rapidjson::Value k;
-        k.SetString(key, allocator);
-
-        rapidjson::Value v;
-        v.SetDouble(dest);
-        value.AddMember(k, v, allocator);
-    }
-};
 
 
 template <>
