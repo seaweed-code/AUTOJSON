@@ -8,15 +8,16 @@
 - 支持模型嵌套
 
 ```c++
-
 struct AA
 {
     unsigned id;
     std::string name;
     bool online;
+  
     DECLARE__JSON__AUTO__TRANSFORM
 };
-
+IMPLEMENT__JSON__AUTO__TRANSFORM(AA,id,name,online)
+  
 struct JOSONODEL {
     int a{};
     float b{};
@@ -35,17 +36,12 @@ struct JOSONODEL {
     bool aaa000{};///支持：普通基础类型
     AA pppp; ///支持：模型嵌套 模型
     std::vector<AA> users; ///支持：嵌套模型数组
-    
-    
-
     std::vector<double>  intts; ///支持：普通类型数组 
-    
     
     DECLARE__JSON__AUTO__TRANSFORM
 };
-//IMPLEMENT__JSON__AUTO__TRANSFORM(JOSONODEL,users)
 IMPLEMENT__JSON__AUTO__TRANSFORM(JOSONODEL,a,b,url,dd,users,name,id,a3,a4,a5,a6,score,aaa000,boosaa,pppp,intts)
-IMPLEMENT__JSON__AUTO__TRANSFORM(AA,id,name,online)
+
 
 int main(int argc, const char * argv[]) {
     std::string json = "{\"id\": 1, \"b\":0.7, \"aaa000\":true, \"intts\":[9.1, 8.2, 7.3, 6.4, 5.5], \"pppp\":{ \"id\": 91, \"name\": \"iiuuuu\", \"online\": false }, \"score\": 9.71,    \"name\": \"mmahew\", \"users\": [{ \"id\": 100, \"name\": \"Tom\", \"online\": true },    { \"id\": 101, \"name\": \"Jerry\", \"online\": false } ],  \"boosaa\": [\"---8.8\", \"ppp9.9\", \"kkk0.800\"],  \"url\": \"www.runoob.com\"}";
@@ -56,7 +52,6 @@ int main(int argc, const char * argv[]) {
     
     auto sss = aa.transform_to_json();///自动模型 转JSON
   
-    
     std::cout << "Hello, World!\n";
     return 0;
 }
