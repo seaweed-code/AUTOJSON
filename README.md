@@ -3,7 +3,7 @@
 
 为类注入运行时反射机制，使得可以自动像高级语言一样，自动JSON转成模型，模型转JSON，而不需逐个字段手动转，支持：
 
-- `double`    `float`   ` bool`   `int ` `unsigned int`  `int64_t`   `uint64_t`
+- `double`    `float`   ` bool`   `int ` `unsigned int`  `int64_t`   `uint64_t` `std::string`
 - `std::vector< T >` ，T 可以是上面的基础类型，或者嵌套的模型，但不支持：`std::vector< bool >` 因为C++模版库对`std::vector< bool > `进行了特化
 - 支持模型嵌套
 
@@ -22,7 +22,7 @@ struct JOSONODEL {
     float b{};
     //float b0000{};
     std::string url;
-    std::string name;
+    std::string name;//////支持：字符串转换
     std::vector<int> dd;
     double score;
     std::vector<std::string> boosaa;
@@ -32,13 +32,13 @@ struct JOSONODEL {
     int a4{};
     int a5{};
     int a6{};
-    bool aaa000{};
-    AA pppp;
-    std::vector<AA> users;
+    bool aaa000{};///支持：普通基础类型
+    AA pppp; ///支持：模型嵌套 模型
+    std::vector<AA> users; ///支持：嵌套模型数组
     
     
 
-    std::vector<double>  intts;
+    std::vector<double>  intts; ///支持：普通类型数组 
     
     
     DECLARE__JSON__AUTO__TRANSFORM
