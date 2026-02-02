@@ -4,7 +4,7 @@
 为类注入运行时反射机制，使得可以自动把JSON转成模型，模型转JSON，而不需逐个字段手动转，支持：
 
 - `double`    `float`   ` bool`   `int ` `unsigned int`  `int64_t`   `uint64_t`
-- std::vector<T> ，T 可以是上面的基础类型，或者嵌套的模型，但不支持：std::vector<bool>
+- `std::vector< T >` ，T 可以是上面的基础类型，或者嵌套的模型，但不支持：`std::vector< bool >` 因为C++模版库对`std::vector< bool > `进行了特化
 - 支持模型嵌套
 
 ```c++
