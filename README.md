@@ -52,9 +52,9 @@ int main(int argc, const char * argv[]) {
     
     JOSONODEL aa;
     
-    aa.transform_from_json(json);
+    aa.transform_from_json(json); ///自动JONS 转模型
     
-    auto sss = aa.transform_to_json();
+    auto sss = aa.transform_to_json();///自动模型 转JSON
   
     
     std::cout << "Hello, World!\n";
