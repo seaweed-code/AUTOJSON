@@ -11,10 +11,10 @@
 #include <unordered_map>
 #include <vector>
 #include <type_traits>
-#include "document.h"
-#include "writer.h"
-#include "stringbuffer.h"
-#include "error/en.h"
+#include "rapidjson/document.h"
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
+#include "rapidjson/error/en.h"
 
 namespace auto_json {
 using JsonLocation = rapidjson::Value;

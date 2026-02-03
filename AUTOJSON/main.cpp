@@ -41,8 +41,8 @@ struct JOSONODEL {
     DECLARE__JSON__AUTO__TRANSFORM
 };
 //IMPLEMENT__JSON__AUTO__TRANSFORM(JOSONODEL,users)
-IMPLEMENT__JSON__AUTO__TRANSFORM(JOSONODEL,a,b,url,dd,users,name,id,a3,a4,a5,a6,score,aaa000,boosaa,pppp,intts)
-IMPLEMENT__JSON__AUTO__TRANSFORM(AA,id,name,online)
+IMPLEMENT__JSON__AUTO__TRANSFORM_16(JOSONODEL,a,b,url,dd,users,name,id,a3,a4,a5,a6,score,aaa000,boosaa,pppp,intts)
+IMPLEMENT__JSON__AUTO__TRANSFORM_3(AA,id,name,online)
 
 int main(int argc, const char * argv[]) {
     std::string json = "{\"id\": 1, \"b\":0.7, \"aaa000\":true, \"intts\":[9.1, 8.2, 7.3, 6.4, 5.5], \"pppp\":{ \"id\": 91, \"name\": \"iiuuuu\", \"online\": false }, \"score\": 9.71,    \"name\": \"mmahew\", \"users\": [{ \"id\": 100, \"name\": \"Tom\", \"online\": true },    { \"id\": 101, \"name\": \"Jerry\", \"online\": false } ],  \"boosaa\": [\"---8.8\", \"ppp9.9\", \"kkk0.800\"],  \"url\": \"www.runoob.com\"}";
