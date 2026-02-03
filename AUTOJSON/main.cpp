@@ -54,6 +54,6 @@ int main(int argc, const char * argv[]) {
     auto sss = aa.transform_to_json();
   
     
-    std::cout << "Hello, World!\n";
+    std::cout << sss;
     return 0;
 }
