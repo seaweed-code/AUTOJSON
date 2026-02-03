@@ -11,10 +11,10 @@
 #include <unordered_map>
 #include <vector>
 #include <type_traits>
-#include "rapidjson/document.h"
-#include "rapidjson/writer.h"
-#include "rapidjson/stringbuffer.h"
-#include "rapidjson/error/en.h"
+#include "document.h"
+#include "writer.h"
+#include "stringbuffer.h"
+#include "error/en.h"
 
 namespace auto_json {
 using JsonLocation = rapidjson::Value;
@@ -32,13 +32,23 @@ struct ReflectInfo
 using ReflectMapType = std::unordered_map<const char*,ReflectInfo>;
 
 template<typename T>
-using _is_reflect_type_ = std::enable_if_t<std::is_same_v<decltype(T::reflect_map),const ReflectMapType>>;
+using _is_reflect_type_ =typename std::enable_if<std::is_same<decltype(T::reflect_map),const ReflectMapType>::value, ReflectMapType>::type;
 
-template <typename  T,typename N = void>
-struct  is_reflect_type:std::false_type{};
+template <typename T>
+struct is_reflect_type
+{
+private:
+	template <typename U, const ReflectMapType* = &U::reflect_map>
+	static std::true_type test(int);
 
-template <typename  T>
-struct  is_reflect_type<T,_is_reflect_type_<T>>:std::true_type{};
+	template <typename>
+	static std::false_type test(...);
+
+public:
+	static const bool value = decltype(test<T>(0))::value;
+};
+
+
 
 
 template <typename  T,typename Encoding, typename Allocator>
@@ -85,8 +95,8 @@ template <typename Encoding, typename Allocator>
 struct  adapter<float,Encoding,Allocator>
 {
     using Type = float;
-   inline static Type get(const rapidjson::GenericValue<Encoding,Allocator>&value)  {return value.GetFloat();}
-    inline static void set(rapidjson::GenericValue<Encoding,Allocator>&value,Type newValue,Allocator&){value.SetFloat(newValue);}
+   inline static Type get(const rapidjson::GenericValue<Encoding,Allocator>&value)  {return static_cast<Type>(value.GetDouble());}///rapidjson did not support float for this version
+    inline static void set(rapidjson::GenericValue<Encoding,Allocator>&value,Type newValue,Allocator&){value.SetDouble(newValue);}
 };
 template <typename Encoding, typename Allocator>
 struct  adapter<bool,Encoding,Allocator>
@@ -108,7 +118,7 @@ struct transform;
 
 
 template <typename  T>
-struct transform<T,_is_reflect_type_<T>>
+struct transform<T, typename std::enable_if<is_reflect_type<T>::value>::type>
 {
     using Type = T;
     static  bool from_json(const char*key,const JsonLocation &json,void*pThis,OffsetType offset)
@@ -187,7 +197,7 @@ struct transform<std::vector<T>>
 };
 
 template <typename  T>
-struct transform<T,std::enable_if_t<std::is_integral<T>::value || std::is_floating_point<T>::value || std::is_same<T,std::string>::value>>
+struct transform<T, typename std::enable_if<std::is_integral<T>::value || std::is_floating_point<T>::value || std::is_same<T,std::string>::value>::type>
 {
     using Type = T;
     using Encoding = typename JsonLocation::EncodingType;
@@ -244,12 +254,14 @@ bool transform_from_json(void *pThis,const ReflectMapType &reflect_map ,const Js
 bool transform_from_json(void *pThis,const ReflectMapType &reflect_map ,const std::string& json)
 {
     rapidjson::Document doc;
-    rapidjson::ParseResult ok = doc.Parse(json.c_str());
-    if (!ok) 
-    {
-        printf("Parse Json Error: %s at %zu\n",rapidjson::GetParseError_En(ok.Code()),ok.Offset());
-        return  false;
-    }
+	doc.Parse(json.c_str());
+
+	if (doc.HasParseError()) {
+		rapidjson::ParseErrorCode code = doc.GetParseError();
+		size_t offset = doc.GetErrorOffset();
+		printf("Parse Json Error: %s at %zu\n", rapidjson::GetParseError_En(code), offset);
+		return  false;
+	}
     rapidjson::Value& root = doc;
     return transform_from_json(pThis, reflect_map, root);
 }
@@ -308,31 +320,93 @@ inline std::string transform_to_json(){return auto_json::transform_to_json(this,
 inline void transform_to_json(rapidjson::Value &value,rapidjson::Document::AllocatorType &allocator){auto_json::transform_to_json(this, value,allocator,reflect_map);}
 
 
-#ifdef _MSC_VER ///VS2015
 
-
-#define __EXPAND__(X)  X
-#define __MACRO__ARG__COUNT__(_0, _1, _2, _3, _4, _5, _6, _7, _8,_9,_10,_11,_12,_13,_14,_15,_16,_17,_18,_19, COUNT, ...)  COUNT
-#define _MACROARGCOUNT_(...) __EXPAND__(__MACRO__ARG__COUNT__(__VA_ARGS__,20,19,18,17,16,15,14,13,12,11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1))
-
-#else //GCC  4.8.5
-
-
-#define __MACRO__ARG__COUNT__(_0, _1, _2, _3, _4, _5, _6, _7, _8,_9,_10,_11,_12,_13,_14,_15,_16,_17,_18,_19, COUNT, ...)  COUNT
-#define _MACROARGCOUNT_(...) __MACRO__ARG__COUNT__(__VA_ARGS__,20,19,18,17,16,15,14,13,12,11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1)
-
-#endif
-
-#define __CONCAT__(A,B) ____CONCAT____(A,B)
-#define ____CONCAT____(A,B)   A##B
-
-#define __CONCATFUNCTION__(...)  __CONCAT__(__ADD__JSON__KEY__ , _MACROARGCOUNT_(__VA_ARGS__))
-
-#define IMPLEMENT__JSON__AUTO__TRANSFORM(C,...)   \
+#define IMPLEMENT__JSON__AUTO__TRANSFORM_1(C,_1)  \
 const  auto_json::ReflectMapType C::reflect_map = {\
-    __CONCATFUNCTION__(__VA_ARGS__)(C,__VA_ARGS__)  \
+    __ADD__JSON__KEY__1(C,_1)  \
+};
+
+#define IMPLEMENT__JSON__AUTO__TRANSFORM_2(C,_1,_2)  \
+const  auto_json::ReflectMapType C::reflect_map = {\
+    __ADD__JSON__KEY__2(C,_1,_2)  \
 };
 
 
+#define IMPLEMENT__JSON__AUTO__TRANSFORM_3(C,_1,_2,_3)  \
+const  auto_json::ReflectMapType C::reflect_map = {\
+    __ADD__JSON__KEY__3(C,_1,_2,_3)  \
+};
 
+#define IMPLEMENT__JSON__AUTO__TRANSFORM_4(C,_1,_2,_3,_4)  \
+const  auto_json::ReflectMapType C::reflect_map = {\
+    __ADD__JSON__KEY__4(C,_1,_2,_3,_4) \
+};
+
+#define IMPLEMENT__JSON__AUTO__TRANSFORM_5(C,_1,_2,_3,_4,_5)  \
+const  auto_json::ReflectMapType C::reflect_map = {\
+    __ADD__JSON__KEY__5(C,_1,_2,_3,_4,_5) \
+};
+
+#define IMPLEMENT__JSON__AUTO__TRANSFORM_6(C,_1,_2,_3,_4,_5,_6)  \
+const  auto_json::ReflectMapType C::reflect_map = {\
+    __ADD__JSON__KEY__6(C,_1,_2,_3,_4,_5,_6)  \
+};
+
+#define IMPLEMENT__JSON__AUTO__TRANSFORM_7(C,_1,_2,_3,_4,_5,_6,_7)  \
+const  auto_json::ReflectMapType C::reflect_map = {\
+    __ADD__JSON__KEY__7(C,_1,_2,_3,_4,_5,_6,_7)  \
+};
+
+#define IMPLEMENT__JSON__AUTO__TRANSFORM_8(C,_1,_2,_3,_4,_5,_6,_7,_8)  \
+const  auto_json::ReflectMapType C::reflect_map = {\
+    __ADD__JSON__KEY__8(C,_1,_2,_3,_4,_5,_6,_7,_8)  \
+};
+#define IMPLEMENT__JSON__AUTO__TRANSFORM_9(C,_1,_2,_3,_4,_5,_6,_7,_8,_9)  \
+const  auto_json::ReflectMapType C::reflect_map = {\
+    __ADD__JSON__KEY__9(C,_1,_2,_3,_4,_5,_6,_7,_8,_9)  \
+};
+#define IMPLEMENT__JSON__AUTO__TRANSFORM_10(C,_1,_2,_3,_4,_5,_6,_7,_8,_9,_10)  \
+const  auto_json::ReflectMapType C::reflect_map = {\
+    __ADD__JSON__KEY__10(C,_1,_2,_3,_4,_5,_6,_7,_8,_9,_10)  \
+};
+#define IMPLEMENT__JSON__AUTO__TRANSFORM_11(C,_1,_2,_3,_4,_5,_6,_7,_8,_9,_10,_11)   \
+const  auto_json::ReflectMapType C::reflect_map = {\
+    __ADD__JSON__KEY__11(C,_1,_2,_3,_4,_5,_6,_7,_8,_9,_10,_11)   \
+};
+#define IMPLEMENT__JSON__AUTO__TRANSFORM_12(C,_1,_2,_3,_4,_5,_6,_7,_8,_9,_10,_11,_12)  \
+const  auto_json::ReflectMapType C::reflect_map = {\
+    __ADD__JSON__KEY__12(C,_1,_2,_3,_4,_5,_6,_7,_8,_9,_10,_11,_12)  \
+};
+#define IMPLEMENT__JSON__AUTO__TRANSFORM_13(C,_1,_2,_3,_4,_5,_6,_7,_8,_9,_10,_11,_12,_13)  \
+const  auto_json::ReflectMapType C::reflect_map = {\
+    __ADD__JSON__KEY__13(C,_1,_2,_3,_4,_5,_6,_7,_8,_9,_10,_11,_12,_13)  \
+};
+#define IMPLEMENT__JSON__AUTO__TRANSFORM_14(C,_1,_2,_3,_4,_5,_6,_7,_8,_9,_10,_11,_12,_13,_14)  \
+const  auto_json::ReflectMapType C::reflect_map = {\
+    __ADD__JSON__KEY__14(C,_1,_2,_3,_4,_5,_6,_7,_8,_9,_10,_11,_12,_13,_14)  \
+};
+#define IMPLEMENT__JSON__AUTO__TRANSFORM_15(C,_1,_2,_3,_4,_5,_6,_7,_8,_9,_10,_11,_12,_13,_14,_15)  \
+const  auto_json::ReflectMapType C::reflect_map = {\
+    __ADD__JSON__KEY__15(C,_1,_2,_3,_4,_5,_6,_7,_8,_9,_10,_11,_12,_13,_14,_15) \
+};
+#define IMPLEMENT__JSON__AUTO__TRANSFORM_16(C,_1,_2,_3,_4,_5,_6,_7,_8,_9,_10,_11,_12,_13,_14,_15,_16)  \
+const  auto_json::ReflectMapType C::reflect_map = {\
+    __ADD__JSON__KEY__16(C,_1,_2,_3,_4,_5,_6,_7,_8,_9,_10,_11,_12,_13,_14,_15,_16)  \
+};
+#define IMPLEMENT__JSON__AUTO__TRANSFORM_17(C,_1,_2,_3,_4,_5,_6,_7,_8,_9,_10,_11,_12,_13,_14,_15,_16,_17)  \
+const  auto_json::ReflectMapType C::reflect_map = {\
+    __ADD__JSON__KEY__17(C,_1,_2,_3,_4,_5,_6,_7,_8,_9,_10,_11,_12,_13,_14,_15,_16,_17)  \
+};
+#define IMPLEMENT__JSON__AUTO__TRANSFORM_18(C,_1,_2,_3,_4,_5,_6,_7,_8,_9,_10,_11,_12,_13,_14,_15,_16,_17,_18)  \
+const  auto_json::ReflectMapType C::reflect_map = {\
+    __ADD__JSON__KEY__18(C,_1,_2,_3,_4,_5,_6,_7,_8,_9,_10,_11,_12,_13,_14,_15,_16,_17,_18)  \
+};
+#define IMPLEMENT__JSON__AUTO__TRANSFORM_19(C,_1,_2,_3,_4,_5,_6,_7,_8,_9,_10,_11,_12,_13,_14,_15,_16,_17,_18,_19)   \
+const  auto_json::ReflectMapType C::reflect_map = {\
+    __ADD__JSON__KEY__19(C,_1,_2,_3,_4,_5,_6,_7,_8,_9,_10,_11,_12,_13,_14,_15,_16,_17,_18,_19)  \
+};
+#define IMPLEMENT__JSON__AUTO__TRANSFORM_20(C,_1,_2,_3,_4,_5,_6,_7,_8,_9,_10,_11,_12,_13,_14,_15,_16,_17,_18,_19,_20)  \
+const  auto_json::ReflectMapType C::reflect_map = {\
+    __ADD__JSON__KEY__20(C,_1,_2,_3,_4,_5,_6,_7,_8,_9,_10,_11,_12,_13,_14,_15,_16,_17,_18,_19,_20)  \
+};
 #endif /* JsonTransformAuto.h */
