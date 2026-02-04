@@ -8,10 +8,10 @@
 - `double`    `float`   ` bool`   `int ` `unsigned int`  `int64_t`   `uint64_t` `std::string`
 - `std::vector< T >` ，T 可以是上面的基础类型，或者自定义对象。
 - 支持对象嵌套
+- `std::vector< std::vector<T> >` 数组嵌套数组,T 可以上面支持的任意类型
 
 不支持：
 
-- `std::vector< std::vector<T> >` 数组嵌套数组暂不支持
 - `std::vector<bool>` 因为C++模版库对`std::vector<bool> `进行了特化，需要通过其他手动避免使用该特化模版。
 
 ```c++
@@ -31,7 +31,7 @@ struct JOSONODEL {
     double score;///支持
     std::string url;
     std::string name;//////支持：字符串转换
-    std::vector<int> dd;
+    std::vector<std::vector<int>> dd; ///支持
     std::vector<std::string> boosaa;///支持 字符串数组
     int id{};
     int a3{};
