@@ -40,6 +40,12 @@ struct  is_reflect_type:std::false_type{};
 template <typename  T>
 struct  is_reflect_type<T,_is_reflect_type_<T>>:std::true_type{};
 
+template <typename  T>
+struct  is_vector_type:std::false_type{};
+
+template <typename  T>
+struct  is_vector_type<std::vector<T>>:std::true_type{};
+
 
 template <typename  T,typename Encoding, typename Allocator>
 struct  adapter;
@@ -180,20 +186,37 @@ struct transform<std::vector<T>>
     }
     static  void to_json(const char*key,rapidjson::Value &value,rapidjson::Document::AllocatorType &allocator,void*pThis,OffsetType offset)
     {
+        if (key == nullptr) {///array
+            auto && dest = *reinterpret_cast<Type*>(pThis);
+            for(auto&&element :dest)
+            {
+                rapidjson::Value e;
+                if (is_reflect_type<T>::value) {
+                    e.SetObject();
+                }else if (is_vector_type<T>::value) {
+                    e.SetArray();
+                }
+                transform<T>::to_json(nullptr,e,allocator,&element,0);
+                value.PushBack(e, allocator);
+            }
+            return;
+        }
         auto && dest = *reinterpret_cast<Type*>(static_cast<char*>(pThis) +  offset);
-        rapidjson::Value elements(rapidjson::kArrayType);//创建一个Array类型的元素
+        rapidjson::Value elements(rapidjson::kArrayType);
         for(auto&&element :dest)
         {
             rapidjson::Value e;
             if (is_reflect_type<T>::value) {
                 e.SetObject();
+            }else if (is_vector_type<T>::value) {
+                e.SetArray();
             }
             transform<T>::to_json(nullptr,e,allocator,&element,0);
             elements.PushBack(e, allocator);
         }
         rapidjson::Value k;
         k.SetString(key, allocator);
-        value.AddMember(k, elements, allocator);//添加数组
+        value.AddMember(k, elements, allocator);
     }
 };
 
