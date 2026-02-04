@@ -154,6 +154,17 @@ struct transform<std::vector<T>>
     using Type = std::vector<T>;
     static  bool from_json(const char*key,const JsonLocation &json,void*pThis,OffsetType offset)
     {
+        if (key == nullptr) {///array
+            auto&& datas = json[static_cast<int>(offset)];
+            if (datas.IsArray() && datas.Size() > 0) {
+                auto && dest = *reinterpret_cast<Type*>(pThis);
+                dest.resize(datas.Size());
+                for (int i=0; i<datas.Size(); i++) {
+                   transform<T>::from_json(nullptr,datas, &dest[i],i);
+                }
+            }
+            return true;
+        }
         if (json.HasMember(key)) {
             auto&& datas = json[key];
             if (datas.IsArray() && datas.Size() > 0) {
