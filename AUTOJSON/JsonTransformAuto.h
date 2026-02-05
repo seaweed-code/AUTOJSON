@@ -116,7 +116,12 @@ template <typename Encoding, typename Allocator>
 struct  adapter<float,Encoding,Allocator>
 {
     using Type = float;
-   inline static Type get(const rapidjson::GenericValue<Encoding,Allocator>&value)  {return static_cast<Type>(value.GetDouble());}///rapidjson did not support float for this version
+   inline static Type get(const rapidjson::GenericValue<Encoding,Allocator>&value)  
+    {
+       if (value.IsNumber()) return static_cast<Type>(value.GetDouble());
+       if (value.IsBool()) return static_cast<Type>(value.GetBool());
+       return {};
+   }///rapidjson did not support float for this version
     inline static void set(rapidjson::GenericValue<Encoding,Allocator>&value,Type newValue,Allocator&){value.SetDouble(newValue);}
 };
 template <typename Encoding, typename Allocator>
