@@ -48,7 +48,11 @@ public:
 	static const bool value = decltype(test<T>(0))::value;
 };
 
+template <typename  T>
+struct  is_vector_type:std::false_type{};
 
+template <typename  T>
+struct  is_vector_type<std::vector<T>>:std::true_type{};
 
 
 template <typename  T,typename Encoding, typename Allocator>
@@ -162,38 +166,66 @@ template <typename  T>
 struct transform<std::vector<T>>
 {
     using Type = std::vector<T>;
-    static  bool from_json(const char*key,const JsonLocation &json,void*pThis,OffsetType offset)
-    {
-        if (json.HasMember(key)) {
-            auto&& datas = json[key];
-            if (datas.IsArray() && datas.Size() > 0) {
-                auto && dest = *reinterpret_cast<Type*>(static_cast<char*>(pThis) + offset);
-                dest.resize(datas.Size());
-                for (int i=0; i<datas.Size(); i++) {
-                   transform<T>::from_json(nullptr,datas, &dest[i],i);
-                }
-                return  true;
-            }
-        }
-        return false;
-    }
-    static  void to_json(const char*key,rapidjson::Value &value,rapidjson::Document::AllocatorType &allocator,void*pThis,OffsetType offset)
-    {
-        auto && dest = *reinterpret_cast<Type*>(static_cast<char*>(pThis) +  offset);
-        rapidjson::Value elements(rapidjson::kArrayType);//创建一个Array类型的元素
-        for(auto&&element :dest)
-        {
-            rapidjson::Value e;
-            if (is_reflect_type<T>::value) {
-                e.SetObject();
-            }
-            transform<T>::to_json(nullptr,e,allocator,&element,0);
-            elements.PushBack(e, allocator);
-        }
-        rapidjson::Value k;
-        k.SetString(key, allocator);
-        value.AddMember(k, elements, allocator);//添加数组
-    }
+       static  bool from_json(const char*key,const JsonLocation &json,void*pThis,OffsetType offset)
+       {
+           if (key == nullptr) {///array
+               auto&& datas = json[static_cast<int>(offset)];
+               if (datas.IsArray() && datas.Size() > 0) {
+                   auto && dest = *reinterpret_cast<Type*>(pThis);
+                   dest.resize(datas.Size());
+                   for (int i=0; i<datas.Size(); i++) {
+                      transform<T>::from_json(nullptr,datas, &dest[i],i);
+                   }
+               }
+               return true;
+           }
+           if (json.HasMember(key)) {
+               auto&& datas = json[key];
+               if (datas.IsArray() && datas.Size() > 0) {
+                   auto && dest = *reinterpret_cast<Type*>(static_cast<char*>(pThis) + offset);
+                   dest.resize(datas.Size());
+                   for (int i=0; i<datas.Size(); i++) {
+                      transform<T>::from_json(nullptr,datas, &dest[i],i);
+                   }
+                   return  true;
+               }
+           }
+           return false;
+       }
+       static  void to_json(const char*key,rapidjson::Value &value,rapidjson::Document::AllocatorType &allocator,void*pThis,OffsetType offset)
+       {
+           if (key == nullptr) {///array
+               auto && dest = *reinterpret_cast<Type*>(pThis);
+               for(auto&&element :dest)
+               {
+                   rapidjson::Value e;
+                   if (is_reflect_type<T>::value) {
+                       e.SetObject();
+                   }else if (is_vector_type<T>::value) {
+                       e.SetArray();
+                   }
+                   transform<T>::to_json(nullptr,e,allocator,&element,0);
+                   value.PushBack(e, allocator);
+               }
+               return;
+           }
+           auto && dest = *reinterpret_cast<Type*>(static_cast<char*>(pThis) +  offset);
+           rapidjson::Value elements(rapidjson::kArrayType);
+           for(auto&&element :dest)
+           {
+               rapidjson::Value e;
+               if (is_reflect_type<T>::value) {
+                   e.SetObject();
+               }else if (is_vector_type<T>::value) {
+                   e.SetArray();
+               }
+               transform<T>::to_json(nullptr,e,allocator,&element,0);
+               elements.PushBack(e, allocator);
+           }
+           rapidjson::Value k;
+           k.SetString(key, allocator);
+           value.AddMember(k, elements, allocator);
+       }
 };
 
 template <typename  T>
