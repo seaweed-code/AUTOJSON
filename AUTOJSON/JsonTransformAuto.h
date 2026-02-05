@@ -106,10 +106,8 @@ struct  adapter<double,Encoding,Allocator>
     using Type = double;
    inline static Type get(const rapidjson::GenericValue<Encoding,Allocator>&value)  
     {
-       if (value.IsDouble()) return value.GetDouble();
+       if (value.IsNumber()) return value.GetDouble();
        if (value.IsBool()) return static_cast<Type>(value.GetBool());
-       if (value.IsUint()) return  static_cast<Type>(value.GetUint());
-       if (value.IsInt()) return  static_cast<Type>(value.GetInt());
        return {};
    }
     inline static void set(rapidjson::GenericValue<Encoding,Allocator>&value,Type newValue,Allocator&){value.SetDouble(newValue);}
