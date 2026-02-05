@@ -143,6 +143,8 @@ struct  adapter<std::string,Encoding,Allocator>
     inline static Type get(const rapidjson::GenericValue<Encoding,Allocator>&value)  
     {
         if (value.IsString()) value.GetString();
+        if (value.IsInt()) return  std::to_string(value.GetInt());
+        if (value.IsDouble()) return  std::to_string(value.GetDouble());
         return {};
     }
     inline static void set(rapidjson::GenericValue<Encoding,Allocator>&value,const Type newValue,Allocator&allocator){value.SetString(newValue.c_str(), allocator);}
