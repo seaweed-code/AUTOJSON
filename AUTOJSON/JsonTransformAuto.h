@@ -76,7 +76,13 @@ template <typename Encoding, typename Allocator>
 struct  adapter<unsigned,Encoding,Allocator>
 {
     using Type = unsigned;
-    inline static Type get(const rapidjson::GenericValue<Encoding,Allocator>&value)  {return value.GetUint();}
+    inline static Type get(const rapidjson::GenericValue<Encoding,Allocator>&value)  {
+        if (value.IsUint()) return  value.GetUint();
+        if (value.IsInt()) return  static_cast<Type>(value.GetInt());
+        if (value.IsDouble()) return static_cast<Type>(value.GetDouble());
+        if (value.IsBool()) return static_cast<Type>(value.GetBool());
+        return {};
+    }
     inline static void set(rapidjson::GenericValue<Encoding,Allocator>&value,Type newValue,Allocator&){value.SetUint(newValue);}
 };
 
