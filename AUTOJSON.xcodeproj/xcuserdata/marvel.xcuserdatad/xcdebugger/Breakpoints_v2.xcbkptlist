@@ -7,8 +7,8 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "7FE892D7-CA55-449B-B641-4F4FDF0D93BE"
-            shouldBeEnabled = "No"
+            uuid = "2B910284-A3C5-45BC-9D6F-9977EA7930F3"
+            shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "AUTOJSON/main.cpp"
