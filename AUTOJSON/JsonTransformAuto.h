@@ -90,14 +90,27 @@ template <typename Encoding, typename Allocator>
 struct  adapter<int64_t,Encoding,Allocator>
 {
     using Type = int64_t;
-   inline static Type get(const rapidjson::GenericValue<Encoding,Allocator>&value)  {return value.GetInt64();}
+   inline static Type get(const rapidjson::GenericValue<Encoding,Allocator>&value)  
+    {
+       if (value.IsInt64()) return value.GetInt64();
+       if (value.IsDouble()) return static_cast<Type>(value.GetDouble());
+       if (value.IsBool()) return static_cast<Type>(value.GetBool());
+       return {};
+   }
     inline static void set(rapidjson::GenericValue<Encoding,Allocator>&value,Type newValue,Allocator&){value.SetInt64(newValue);}
 };
 template <typename Encoding, typename Allocator>
 struct  adapter<uint64_t,Encoding,Allocator>
 {
     using Type = uint64_t;
-   inline static Type get(const rapidjson::GenericValue<Encoding,Allocator>&value)  {return value.GetUint64();}
+   inline static Type get(const rapidjson::GenericValue<Encoding,Allocator>&value)
+    {
+       if (value.IsUint64()) return value.GetUint64();
+       if (value.IsInt64()) return static_cast<Type>(value.GetInt64());
+       if (value.IsDouble()) return static_cast<Type>(value.GetDouble());
+       if (value.IsBool()) return static_cast<Type>(value.GetBool());
+       return {};
+   }
     inline static void set(rapidjson::GenericValue<Encoding,Allocator>&value,Type newValue,Allocator&){value.SetUint64(newValue);}
 };
 template <typename Encoding, typename Allocator>
