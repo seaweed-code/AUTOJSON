@@ -65,7 +65,7 @@ struct  adapter<int,Encoding,Allocator>
     inline static Type get(const rapidjson::GenericValue<Encoding,Allocator>&value)  
     {
         if (value.IsInt()) return  value.GetInt();
-        if (value.IsDouble()) return static_cast<Type>(value.GetDouble());
+        if (value.IsNumber()) return static_cast<Type>(value.GetDouble());
         if (value.IsBool()) return static_cast<Type>(value.GetBool());
         return {};
     }
@@ -78,8 +78,7 @@ struct  adapter<unsigned,Encoding,Allocator>
     using Type = unsigned;
     inline static Type get(const rapidjson::GenericValue<Encoding,Allocator>&value)  {
         if (value.IsUint()) return  value.GetUint();
-        if (value.IsInt()) return  static_cast<Type>(value.GetInt());
-        if (value.IsDouble()) return static_cast<Type>(value.GetDouble());
+        if (value.IsNumber()) return  static_cast<Type>(value.IsDouble());
         if (value.IsBool()) return static_cast<Type>(value.GetBool());
         return {};
     }
@@ -93,7 +92,7 @@ struct  adapter<int64_t,Encoding,Allocator>
    inline static Type get(const rapidjson::GenericValue<Encoding,Allocator>&value)  
     {
        if (value.IsInt64()) return value.GetInt64();
-       if (value.IsDouble()) return static_cast<Type>(value.GetDouble());
+       if (value.IsNumber()) return static_cast<Type>(value.GetDouble());
        if (value.IsBool()) return static_cast<Type>(value.GetBool());
        return {};
    }
@@ -106,8 +105,7 @@ struct  adapter<uint64_t,Encoding,Allocator>
    inline static Type get(const rapidjson::GenericValue<Encoding,Allocator>&value)
     {
        if (value.IsUint64()) return value.GetUint64();
-       if (value.IsInt64()) return static_cast<Type>(value.GetInt64());
-       if (value.IsDouble()) return static_cast<Type>(value.GetDouble());
+       if (value.IsNumber()) return static_cast<Type>(value.GetDouble());
        if (value.IsBool()) return static_cast<Type>(value.GetBool());
        return {};
    }
