@@ -15,37 +15,44 @@
 - `std::vector<bool>` 因为C++模版库对`std::vector<bool> `进行了特化，需要通过其他手动避免使用该特化模版。
 
 ```c++
+
 struct AA
 {
     unsigned id;
     std::string name;
     bool online;
-  
     DECLARE__JSON__AUTO__TRANSFORM
 };
-IMPLEMENT__JSON__AUTO__TRANSFORM(AA,id,name,online)
-  
+
 struct JOSONODEL {
-    int a{};///支持
-    float b{};///支持
-    double score;///支持
+    int a{};
+    float b{};
+    //float b0000{};
     std::string url;
-    std::string name;//////支持：字符串转换
-    std::vector<int> dd;
-    std::vector<std::string> boosaa;///支持 字符串数组
+    std::string name;
+    std::vector<std::vector<int>> dd;
+    double score;
+    std::vector<std::string> boosaa;
+    
     int id{};
     int a3{};
     int a4{};
     int a5{};
     int a6{};
-    bool aaa000{};///支持：普通基础类型
-    AA pppp; ///支持：模型嵌套 模型
-    std::vector<AA> users; ///支持：嵌套模型数组
-    std::vector<double>  intts; ///支持：普通类型数组 
+    bool aaa000{};
+    AA pppp;
+    std::vector<AA> users;
+    
+    
+
+    std::vector<double>  intts;
+    
     
     DECLARE__JSON__AUTO__TRANSFORM
 };
-IMPLEMENT__JSON__AUTO__TRANSFORM(JOSONODEL,a,b,url,dd,users,name,id,a3,a4,a5,a6,score,aaa000,boosaa,pppp,intts)
+//IMPLEMENT__JSON__AUTO__TRANSFORM(JOSONODEL,users)
+IMPLEMENT__JSON__AUTO__TRANSFORM_16(JOSONODEL,a,b,url,dd,users,name,id,a3,a4,a5,a6,score,aaa000,boosaa,pppp,intts)
+IMPLEMENT__JSON__AUTO__TRANSFORM_3(AA,id,name,online)
 
 int main(int argc, const char * argv[]) {
     std::string json = "{\"id\": true, \"b\":0.7,\"dd\":[[1,2,90]], \"aaa000\":true, \"intts\":[9.1, 8.2, 7.3, 6.4, 5.5], \"pppp\":{ \"id\": 91, \"name\": \"iiuuuu\", \"online\": false }, \"score\": true,    \"name\": \"mmahew\", \"users\": [{ \"id\": 100, \"name\": \"Tom\", \"online\": true },    { \"id\": 101, \"name\": \"Jerry\", \"online\": false } ],  \"boosaa\": [\"---8.8\", \"ppp9.9\", \"kkk0.800\"],  \"url\": 2.99}";
@@ -60,5 +67,6 @@ int main(int argc, const char * argv[]) {
     std::cout << sss;
     return 0;
 }
+
 ```
 
