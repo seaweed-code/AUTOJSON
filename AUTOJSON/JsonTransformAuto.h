@@ -45,7 +45,7 @@ struct _has_reflect_map_member_<T,typename std::enable_if<std::is_same<decltype(
 
 template <typename T>
 struct _has_reflect_map_static_member_
-{
+{///must static member, but either const or non-const
 private:
     template <typename U, const ReflectMapType* = &U::reflect_map>
     static std::true_type test(int);
