@@ -463,12 +463,17 @@ void test_special_string() {
     obj.transform_from_json(json);
     ASSERT_TRUE(obj.s.find("world") != std::string::npos);
 }
-
+struct DDDD
+{
+    
+    const static auto_json::ReflectMapType reflect_map;
+};
 // ============================================================
 // main
 // ============================================================
 int main() {
-    printf("===== JsonTransformAuto Tests =====\n");
+    auto isss = auto_json::is_reflect_type_v<DDDD>;
+    printf("===== JsonTransformAuto Tests =====%d\n",isss);
 
     RUN_TEST(basic_from_json);
     RUN_TEST(basic_roundtrip);

@@ -182,7 +182,7 @@ struct transform;
 
 
 template <typename  T>
-struct transform<T, typename std::enable_if<is_reflect_type<T>::value>::type>
+struct transform<T, typename std::enable_if<_has_reflect_map_member_<T>::value && _has_reflect_map_static_member_<T>::value>::type>
 {
     using Type = T;
     static  bool from_json(const char*key,const JsonLocation &json,void*pThis,OffsetType offset)
