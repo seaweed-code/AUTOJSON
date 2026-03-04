@@ -10,6 +10,7 @@
 #include <iostream>
 #include <unordered_map>
 #include <vector>
+#include <cstddef>
 #include <type_traits>
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
@@ -32,20 +33,56 @@ struct ReflectInfo
 using ReflectMapType = std::unordered_map<const char*,ReflectInfo>;
 
 template<typename T>
-using _is_reflect_type_ = std::enable_if_t<std::is_same_v<decltype(T::reflect_map),const ReflectMapType>>;
+using _is_reflect_type_ =typename std::enable_if<std::is_same<decltype(T::reflect_map),const ReflectMapType>::value, ReflectMapType>::type;
 
-template <typename  T,typename N = void>
-struct  is_reflect_type:std::false_type{};
+template <typename T>
+struct is_reflect_type
+{
+private:
+    template <typename U, const ReflectMapType* = &U::reflect_map>
+    static std::true_type test(int);
+
+    template <typename>
+    static std::false_type test(...);
+
+public:
+    static const bool value = decltype(test<T>(0))::value;
+};
 
 template <typename  T>
-struct  is_reflect_type<T,_is_reflect_type_<T>>:std::true_type{};
+struct  is_vector_type :std::false_type {};
 
 template <typename  T>
-struct  is_vector_type:std::false_type{};
+struct  is_vector_type<std::vector<T>> :std::true_type {};
 
-template <typename  T>
-struct  is_vector_type<std::vector<T>>:std::true_type{};
 
+template<typename T, typename Encoding, typename Allocator>
+inline T get_number(const rapidjson::GenericValue<Encoding, Allocator>& value) {
+    if (value.IsInt64())   return static_cast<T>(value.GetInt64());
+    if (value.IsUint64())  return static_cast<T>(value.GetUint64());
+    if (value.IsDouble())  return static_cast<T>(value.GetDouble());
+    if (value.IsBool())    return static_cast<T>(value.GetBool());
+    if (value.IsString()) {
+        try {
+            if (std::is_same<T, bool>::value)
+            {
+                const char* s = value.GetString();
+                return strcmp(s, "true") == 0 || strcmp(s, "1") == 0;
+            }else if (std::is_integral<T>::value)
+            {
+                return static_cast<T>(std::stoll(value.GetString()));
+            }
+            else if(std::is_floating_point<T>::value)
+            {
+                return std::stod(value.GetString());
+            }
+        }
+        catch (...) {
+            return T{};
+        }
+    }
+    return T{};
+}
 
 template <typename  T,typename Encoding, typename Allocator>
 struct  adapter;
@@ -54,7 +91,7 @@ template <typename Encoding, typename Allocator>
 struct  adapter<int,Encoding,Allocator>
 {
     using Type = int;
-    inline static Type get(const rapidjson::GenericValue<Encoding,Allocator>&value)  {return value.GetInt();}
+    inline static Type get(const rapidjson::GenericValue<Encoding,Allocator>&value) { return get_number<Type>(value);}
     inline static void set(rapidjson::GenericValue<Encoding,Allocator>&value,Type newValue,Allocator&){value.SetInt(newValue);}
 };
 
@@ -62,7 +99,7 @@ template <typename Encoding, typename Allocator>
 struct  adapter<unsigned,Encoding,Allocator>
 {
     using Type = unsigned;
-    inline static Type get(const rapidjson::GenericValue<Encoding,Allocator>&value)  {return value.GetUint();}
+    inline static Type get(const rapidjson::GenericValue<Encoding, Allocator>&value) { return get_number<Type>(value); }
     inline static void set(rapidjson::GenericValue<Encoding,Allocator>&value,Type newValue,Allocator&){value.SetUint(newValue);}
 };
 
@@ -70,43 +107,49 @@ template <typename Encoding, typename Allocator>
 struct  adapter<int64_t,Encoding,Allocator>
 {
     using Type = int64_t;
-   inline static Type get(const rapidjson::GenericValue<Encoding,Allocator>&value)  {return value.GetInt64();}
+    inline static Type get(const rapidjson::GenericValue<Encoding, Allocator>&value) { return get_number<Type>(value); }
     inline static void set(rapidjson::GenericValue<Encoding,Allocator>&value,Type newValue,Allocator&){value.SetInt64(newValue);}
 };
 template <typename Encoding, typename Allocator>
 struct  adapter<uint64_t,Encoding,Allocator>
 {
     using Type = uint64_t;
-   inline static Type get(const rapidjson::GenericValue<Encoding,Allocator>&value)  {return value.GetUint64();}
+    inline static Type get(const rapidjson::GenericValue<Encoding, Allocator>&value) { return get_number<Type>(value); }
     inline static void set(rapidjson::GenericValue<Encoding,Allocator>&value,Type newValue,Allocator&){value.SetUint64(newValue);}
 };
 template <typename Encoding, typename Allocator>
 struct  adapter<double,Encoding,Allocator>
 {
     using Type = double;
-   inline static Type get(const rapidjson::GenericValue<Encoding,Allocator>&value)  {return value.GetDouble();}
+    inline static Type get(const rapidjson::GenericValue<Encoding, Allocator>&value) { return get_number<Type>(value); }
     inline static void set(rapidjson::GenericValue<Encoding,Allocator>&value,Type newValue,Allocator&){value.SetDouble(newValue);}
 };
 template <typename Encoding, typename Allocator>
 struct  adapter<float,Encoding,Allocator>
 {
     using Type = float;
-   inline static Type get(const rapidjson::GenericValue<Encoding,Allocator>&value)  {return value.GetFloat();}
-    inline static void set(rapidjson::GenericValue<Encoding,Allocator>&value,Type newValue,Allocator&){value.SetFloat(newValue);}
+    inline static Type get(const rapidjson::GenericValue<Encoding, Allocator>&value) { return get_number<Type>(value); }
+    inline static void set(rapidjson::GenericValue<Encoding,Allocator>&value,Type newValue,Allocator&){value.SetDouble(newValue);}
 };
 template <typename Encoding, typename Allocator>
 struct  adapter<bool,Encoding,Allocator>
 {
     using Type = bool;
-    inline static Type get(const rapidjson::GenericValue<Encoding,Allocator>&value)  {return value.GetBool();}
+    inline static Type get(const rapidjson::GenericValue<Encoding, Allocator>&value) { return get_number<Type>(value); }
     inline static void set(rapidjson::GenericValue<Encoding,Allocator>&value,Type newValue,Allocator&){value.SetBool(newValue);}
 };
 template <typename Encoding, typename Allocator>
 struct  adapter<std::string,Encoding,Allocator>
 {
     using Type = std::string;
-    inline static Type get(const rapidjson::GenericValue<Encoding,Allocator>&value)  {return value.GetString();}
-    inline static void set(rapidjson::GenericValue<Encoding,Allocator>&value,const Type newValue,Allocator&allocator){value.SetString(newValue.c_str(), allocator);}
+    inline static Type get(const rapidjson::GenericValue<Encoding,Allocator>&value)
+    {
+        if (value.IsString())  return value.GetString();
+        if (value.IsInt64())   return std::to_string(value.GetInt64());
+        if (value.IsDouble())  return std::to_string(value.GetDouble());
+        return {};
+    }
+    inline static void set(rapidjson::GenericValue<Encoding,Allocator>&value,const Type& newValue,Allocator&allocator){value.SetString(newValue.c_str(), allocator);}
 };
 
 template <typename  T,typename Enable = void>
@@ -114,7 +157,7 @@ struct transform;
 
 
 template <typename  T>
-struct transform<T,_is_reflect_type_<T>>
+struct transform<T, typename std::enable_if<is_reflect_type<T>::value>::type>
 {
     using Type = T;
     static  bool from_json(const char*key,const JsonLocation &json,void*pThis,OffsetType offset)
@@ -158,15 +201,15 @@ template <typename  T>
 struct transform<std::vector<T>>
 {
     using Type = std::vector<T>;
-    static  bool from_json(const char*key,const JsonLocation &json,void*pThis,OffsetType offset)
+    static  bool from_json(const char*key, const JsonLocation &json, void*pThis, OffsetType offset)
     {
         if (key == nullptr) {///array
             auto&& datas = json[static_cast<int>(offset)];
             if (datas.IsArray() && datas.Size() > 0) {
                 auto && dest = *reinterpret_cast<Type*>(pThis);
                 dest.resize(datas.Size());
-                for (int i=0; i<datas.Size(); i++) {
-                   transform<T>::from_json(nullptr,datas, &dest[i],i);
+                for (int i = 0; i < datas.Size(); i++) {
+                    transform<T>::from_json(nullptr, datas, &dest[i], i);
                 }
             }
             return true;
@@ -176,42 +219,44 @@ struct transform<std::vector<T>>
             if (datas.IsArray() && datas.Size() > 0) {
                 auto && dest = *reinterpret_cast<Type*>(static_cast<char*>(pThis) + offset);
                 dest.resize(datas.Size());
-                for (int i=0; i<datas.Size(); i++) {
-                   transform<T>::from_json(nullptr,datas, &dest[i],i);
+                for (int i = 0; i < datas.Size(); i++) {
+                    transform<T>::from_json(nullptr, datas, &dest[i], i);
                 }
                 return  true;
             }
         }
         return false;
     }
-    static  void to_json(const char*key,rapidjson::Value &value,rapidjson::Document::AllocatorType &allocator,void*pThis,OffsetType offset)
+    static  void to_json(const char*key, rapidjson::Value &value, rapidjson::Document::AllocatorType &allocator, void*pThis, OffsetType offset)
     {
         if (key == nullptr) {///array
             auto && dest = *reinterpret_cast<Type*>(pThis);
-            for(auto&&element :dest)
+            for (auto&&element : dest)
             {
                 rapidjson::Value e;
                 if (is_reflect_type<T>::value) {
                     e.SetObject();
-                }else if (is_vector_type<T>::value) {
+                }
+                else if (is_vector_type<T>::value) {
                     e.SetArray();
                 }
-                transform<T>::to_json(nullptr,e,allocator,&element,0);
+                transform<T>::to_json(nullptr, e, allocator, &element, 0);
                 value.PushBack(e, allocator);
             }
             return;
         }
-        auto && dest = *reinterpret_cast<Type*>(static_cast<char*>(pThis) +  offset);
+        auto && dest = *reinterpret_cast<Type*>(static_cast<char*>(pThis) + offset);
         rapidjson::Value elements(rapidjson::kArrayType);
-        for(auto&&element :dest)
+        for (auto&&element : dest)
         {
             rapidjson::Value e;
             if (is_reflect_type<T>::value) {
                 e.SetObject();
-            }else if (is_vector_type<T>::value) {
+            }
+            else if (is_vector_type<T>::value) {
                 e.SetArray();
             }
-            transform<T>::to_json(nullptr,e,allocator,&element,0);
+            transform<T>::to_json(nullptr, e, allocator, &element, 0);
             elements.PushBack(e, allocator);
         }
         rapidjson::Value k;
@@ -221,7 +266,7 @@ struct transform<std::vector<T>>
 };
 
 template <typename  T>
-struct transform<T,std::enable_if_t<std::is_integral<T>::value || std::is_floating_point<T>::value || std::is_same<T,std::string>::value>>
+struct transform<T, typename std::enable_if<std::is_integral<T>::value || std::is_floating_point<T>::value || std::is_same<T,std::string>::value>::type>
 {
     using Type = T;
     using Encoding = typename JsonLocation::EncodingType;
@@ -261,7 +306,7 @@ struct transform<T,std::enable_if_t<std::is_integral<T>::value || std::is_floati
 };
 
 
-bool transform_from_json(void *pThis,const ReflectMapType &reflect_map ,const JsonLocation& json)
+inline bool transform_from_json(void *pThis,const ReflectMapType &reflect_map ,const JsonLocation& json)
 {
     unsigned int total{};
     for (auto&& p:reflect_map)
@@ -275,20 +320,22 @@ bool transform_from_json(void *pThis,const ReflectMapType &reflect_map ,const Js
     return  total == 0;
 }
 
-bool transform_from_json(void *pThis,const ReflectMapType &reflect_map ,const std::string& json)
+inline bool transform_from_json(void *pThis,const ReflectMapType &reflect_map ,const std::string& json)
 {
     rapidjson::Document doc;
-    rapidjson::ParseResult ok = doc.Parse(json.c_str());
-    if (!ok) 
-    {
-        printf("Parse Json Error: %s at %zu\n",rapidjson::GetParseError_En(ok.Code()),ok.Offset());
+    doc.Parse(json.c_str());
+
+    if (doc.HasParseError()) {
+        rapidjson::ParseErrorCode code = doc.GetParseError();
+        size_t offset = doc.GetErrorOffset();
+        printf("Parse Json Error: %s at %zu\n", rapidjson::GetParseError_En(code), offset);
         return  false;
     }
     rapidjson::Value& root = doc;
     return transform_from_json(pThis, reflect_map, root);
 }
 
-void transform_to_json(void *pThis,rapidjson::Value &value,rapidjson::Document::AllocatorType &allocator,const ReflectMapType &reflect_map)
+inline void transform_to_json(void *pThis,rapidjson::Value &value,rapidjson::Document::AllocatorType &allocator,const ReflectMapType &reflect_map)
 {
     for (auto&& p:reflect_map)
     {
@@ -296,7 +343,7 @@ void transform_to_json(void *pThis,rapidjson::Value &value,rapidjson::Document::
     }
 }
 
-std::string transform_to_json(void *pThis,const ReflectMapType &reflect_map)
+inline std::string transform_to_json(void *pThis,const ReflectMapType &reflect_map)
 {
     rapidjson::Document doc;
     auto &allocator = doc.GetAllocator();
@@ -342,31 +389,19 @@ inline std::string transform_to_json(){return auto_json::transform_to_json(this,
 inline void transform_to_json(rapidjson::Value &value,rapidjson::Document::AllocatorType &allocator){auto_json::transform_to_json(this, value,allocator,reflect_map);}
 
 
-#ifdef _MSC_VER ///VS2015
+#define ___EXPAND___(x) x
 
 
-#define __EXPAND__(X)  X
-#define __MACRO__ARG__COUNT__(_0, _1, _2, _3, _4, _5, _6, _7, _8,_9,_10,_11,_12,_13,_14,_15,_16,_17,_18,_19, COUNT, ...)  COUNT
-#define _MACROARGCOUNT_(...) __EXPAND__(__MACRO__ARG__COUNT__(__VA_ARGS__,20,19,18,17,16,15,14,13,12,11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1))
-
-#else //GCC  4.8.5
+#define ___COUNT___ARGS___(_1,_2,_3,_4,_5,_6,_7,_8,_9,_10, _11,_12,_13,_14,_15,_16,_17,_18,_19,_20,N,...) N
+#define _COUNT_ARGS_(...) ___EXPAND___(___COUNT___ARGS___(__VA_ARGS__, 20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1))
 
 
-#define __MACRO__ARG__COUNT__(_0, _1, _2, _3, _4, _5, _6, _7, _8,_9,_10,_11,_12,_13,_14,_15,_16,_17,_18,_19, COUNT, ...)  COUNT
-#define _MACROARGCOUNT_(...) __MACRO__ARG__COUNT__(__VA_ARGS__,20,19,18,17,16,15,14,13,12,11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1)
+#define ___CONCAT___(a, b) a##b
+#define _CONCAT_(a, b) ___CONCAT___(a, b)
 
-#endif
 
-#define __CONCAT__(A,B) ____CONCAT____(A,B)
-#define ____CONCAT____(A,B)   A##B
-
-#define __CONCATFUNCTION__(...)  __CONCAT__(__ADD__JSON__KEY__ , _MACROARGCOUNT_(__VA_ARGS__))
-
-#define IMPLEMENT__JSON__AUTO__TRANSFORM(C,...)   \
+#define IMPLEMENT__JSON__AUTO__TRANSFORM(C, ...) \
 const  auto_json::ReflectMapType C::reflect_map = {\
-    __CONCATFUNCTION__(__VA_ARGS__)(C,__VA_ARGS__)  \
+  ___EXPAND___(_CONCAT_(__ADD__JSON__KEY__, _COUNT_ARGS_(__VA_ARGS__))(C, __VA_ARGS__))  \
 };
-
-
-
 #endif /* JsonTransformAuto.h */
