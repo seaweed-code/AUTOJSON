@@ -39,7 +39,7 @@ struct _has_reflect_map_member_
 };
 template<typename T>
 struct _has_reflect_map_member_<T,typename std::enable_if<std::is_same<decltype(T::reflect_map),const ReflectMapType>::value>::type>
-{
+{///either non-static member or static member
     static const bool value = true;
 };
 
