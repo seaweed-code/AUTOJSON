@@ -57,6 +57,7 @@ public:
     static const bool value = decltype(test<T>(0))::value;
 };
 
+/// must static member, must const
 template<typename T>
 bool is_reflect_type_v = _has_reflect_map_member_<T>::value && _has_reflect_map_static_member_<T>::value;
 
