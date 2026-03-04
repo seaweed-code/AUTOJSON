@@ -32,8 +32,16 @@ struct ReflectInfo
 
 using ReflectMapType = std::unordered_map<const char*,ReflectInfo>;
 
+template<typename T,typename N=void>
+struct _is_reflect_type_
+{
+    static const bool value = false;
+};
 template<typename T>
-using _is_reflect_type_ =typename std::enable_if<std::is_same<decltype(T::reflect_map),const ReflectMapType>::value, ReflectMapType>::type;
+struct _is_reflect_type_<T,typename std::enable_if<std::is_same<decltype(T::reflect_map),const ReflectMapType>::value>::type>
+{
+    static const bool value = true;
+};
 
 template <typename T>
 struct is_reflect_type
