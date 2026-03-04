@@ -259,7 +259,7 @@ struct transform<std::vector<T>>
             for (auto&&element : dest)
             {
                 rapidjson::Value e;
-                if (is_reflect_type<T>::value) {
+                if (is_reflect_type_v<T>) {
                     e.SetObject();
                 }
                 else if (is_vector_type<T>::value) {
@@ -275,7 +275,7 @@ struct transform<std::vector<T>>
         for (auto&&element : dest)
         {
             rapidjson::Value e;
-            if (is_reflect_type<T>::value) {
+            if (is_reflect_type_v<T>) {
                 e.SetObject();
             }
             else if (is_vector_type<T>::value) {
