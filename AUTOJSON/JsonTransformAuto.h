@@ -33,13 +33,13 @@ struct ReflectInfo
 using ReflectMapType = std::unordered_map<const char*,ReflectInfo>;
 
 template<typename T,typename N=void>
-struct _has_reflect_map_member_
+struct _has_const_reflect_map_member_
 {
     static const bool value = false;
 };
 template<typename T>
-struct _has_reflect_map_member_<T,typename std::enable_if<std::is_same<decltype(T::reflect_map),const ReflectMapType>::value>::type>
-{///either non-static member or static member
+struct _has_const_reflect_map_member_<T,typename std::enable_if<std::is_same<decltype(T::reflect_map),const ReflectMapType>::value>::type>
+{///either non-static member or static member, but must const
     static const bool value = true;
 };
 
@@ -59,7 +59,7 @@ public:
 
 /// must static member, must const
 template<typename T>
-bool is_reflect_type_v = _has_reflect_map_member_<T>::value && _has_reflect_map_static_member_<T>::value;
+bool is_reflect_type_v = _has_const_reflect_map_member_<T>::value && _has_reflect_map_static_member_<T>::value;
 
 template <typename  T>
 struct  is_vector_type :std::false_type {};
@@ -169,7 +169,7 @@ struct transform;
 
 
 template <typename  T>
-struct transform<T, typename std::enable_if<_has_reflect_map_member_<T>::value && _has_reflect_map_static_member_<T>::value>::type>
+struct transform<T, typename std::enable_if<_has_const_reflect_map_member_<T>::value && _has_reflect_map_static_member_<T>::value>::type>
 {
     using Type = T;
     static  bool from_json(const char*key,const JsonLocation &json,void*pThis,OffsetType offset)
