@@ -26,7 +26,7 @@ struct BasicTypes {
     std::string s;
     DECLARE__JSON__AUTO__TRANSFORM
 };
-IMPLEMENT__JSON__AUTO__TRANSFORM_8(BasicTypes, i, u, i64, u64, d, f, b, s)
+IMPLEMENT__JSON__AUTO__TRANSFORM(BasicTypes, i, u, i64, u64, d, f, b, s)
 
 // 嵌套结构体
 struct Address {
@@ -35,7 +35,7 @@ struct Address {
     int         code;
     DECLARE__JSON__AUTO__TRANSFORM
 };
-IMPLEMENT__JSON__AUTO__TRANSFORM_3(Address, city, street, code)
+IMPLEMENT__JSON__AUTO__TRANSFORM(Address, city, street, code)
 
 struct Person {
     std::string name;
@@ -43,7 +43,7 @@ struct Person {
     Address     address;
     DECLARE__JSON__AUTO__TRANSFORM
 };
-IMPLEMENT__JSON__AUTO__TRANSFORM_3(Person, name, age, address)
+IMPLEMENT__JSON__AUTO__TRANSFORM(Person, name, age, address)
 
 // vector 结构体
 struct Container {
@@ -52,7 +52,7 @@ struct Container {
     std::vector<Address>     addr_list;
     DECLARE__JSON__AUTO__TRANSFORM
 };
-IMPLEMENT__JSON__AUTO__TRANSFORM_3(Container, int_list, str_list, addr_list)
+IMPLEMENT__JSON__AUTO__TRANSFORM(Container, int_list, str_list, addr_list)
 
 // 数组嵌套数组结构体
 struct Matrix {
@@ -61,7 +61,7 @@ struct Matrix {
     std::vector<std::vector<Address>>     struct_matrix; // [[{...},{...}],[{...}]]
     DECLARE__JSON__AUTO__TRANSFORM
 };
-IMPLEMENT__JSON__AUTO__TRANSFORM_3(Matrix, int_matrix, str_matrix, struct_matrix)
+IMPLEMENT__JSON__AUTO__TRANSFORM(Matrix, int_matrix, str_matrix, struct_matrix)
 
 // 类型兼容降级结构体（JSON类型与C++类型不匹配）
 struct CompatTypes {
@@ -79,7 +79,7 @@ struct CompatTypes {
     std::string s_from_double;    // JSON: 1.5   -> string (含"1.5")
     DECLARE__JSON__AUTO__TRANSFORM
 };
-IMPLEMENT__JSON__AUTO__TRANSFORM_12(CompatTypes,
+IMPLEMENT__JSON__AUTO__TRANSFORM(CompatTypes,
     i_from_bool, i_from_double, i_from_string,
     d_from_bool, d_from_string, f_from_string,
     b_from_int, b_from_zero, b_from_string,
