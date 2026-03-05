@@ -32,12 +32,23 @@ struct ReflectInfo
 
 using ReflectMapType = std::unordered_map<const char*,ReflectInfo>;
 
-template<typename T>
-using _is_reflect_type_ =typename std::enable_if<std::is_same<decltype(T::reflect_map),const ReflectMapType>::value, ReflectMapType>::type;
+template <typename T>
+struct _has_const_reflect_map_member_
+{///either non-static member or static member, but must const
+private:
+    template <typename U>
+    static char test(const ReflectMapType* const*p, typename std::enable_if<std::is_same<const ReflectMapType, decltype(U::reflect_map)>::value> ::type*);
+
+    template <typename U>
+    static long test(...);
+
+public:
+    static const bool value = sizeof(test<T>(nullptr, nullptr)) == sizeof(char);
+};
 
 template <typename T>
-struct is_reflect_type
-{
+struct _has_reflect_map_static_member_
+{///must static member, but either const or non-const
 private:
     template <typename U, const ReflectMapType* = &U::reflect_map>
     static std::true_type test(int);
@@ -47,6 +58,12 @@ private:
 
 public:
     static const bool value = decltype(test<T>(0))::value;
+};
+
+template <typename T>
+struct is_reflect_type
+{
+    static const bool value = _has_const_reflect_map_member_<T>::value && _has_reflect_map_static_member_<T>::value;
 };
 
 template <typename  T>
