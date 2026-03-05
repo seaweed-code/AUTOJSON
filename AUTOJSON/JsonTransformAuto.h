@@ -32,15 +32,18 @@ struct ReflectInfo
 
 using ReflectMapType = std::unordered_map<const char*,ReflectInfo>;
 
-template<typename T,typename N=void>
+template <typename T>
 struct _has_const_reflect_map_member_
-{
-    static const bool value = false;
-};
-template<typename T>
-struct _has_const_reflect_map_member_<T,typename std::enable_if<std::is_same<decltype(T::reflect_map),const ReflectMapType>::value>::type>
 {///either non-static member or static member, but must const
-    static const bool value = true;
+private:
+    template <typename U>
+    static char test(const ReflectMapType* const*p, typename std::enable_if<std::is_same<const ReflectMapType, decltype(U::reflect_map)>::value> ::type*);
+
+    template <typename U>
+    static long test(...);
+
+public:
+    static const bool value = sizeof(test<T>(nullptr, nullptr)) == sizeof(char);
 };
 
 template <typename T>
@@ -57,9 +60,11 @@ public:
     static const bool value = decltype(test<T>(0))::value;
 };
 
-/// must static member, must const
-template<typename T>
-bool is_reflect_type_v = _has_const_reflect_map_member_<T>::value && _has_reflect_map_static_member_<T>::value;
+template <typename T>
+struct is_reflect_type
+{
+    static const bool value = _has_const_reflect_map_member_<T>::value && _has_reflect_map_static_member_<T>::value;
+};
 
 template <typename  T>
 struct  is_vector_type :std::false_type {};
@@ -169,7 +174,7 @@ struct transform;
 
 
 template <typename  T>
-struct transform<T, typename std::enable_if<_has_const_reflect_map_member_<T>::value && _has_reflect_map_static_member_<T>::value>::type>
+struct transform<T, typename std::enable_if<is_reflect_type<T>::value>::type>
 {
     using Type = T;
     static  bool from_json(const char*key,const JsonLocation &json,void*pThis,OffsetType offset)
@@ -246,7 +251,7 @@ struct transform<std::vector<T>>
             for (auto&&element : dest)
             {
                 rapidjson::Value e;
-                if (is_reflect_type_v<T>) {
+                if (is_reflect_type<T>::value) {
                     e.SetObject();
                 }
                 else if (is_vector_type<T>::value) {
@@ -262,7 +267,7 @@ struct transform<std::vector<T>>
         for (auto&&element : dest)
         {
             rapidjson::Value e;
-            if (is_reflect_type_v<T>) {
+            if (is_reflect_type<T>::value) {
                 e.SetObject();
             }
             else if (is_vector_type<T>::value) {
