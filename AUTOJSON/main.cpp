@@ -472,7 +472,7 @@ struct DDDD
 // main
 // ============================================================
 int main() {
-    auto isss = auto_json::is_reflect_type_v<DDDD>;
+    auto isss = auto_json::is_reflect_type<DDDD>::value;
     printf("===== JsonTransformAuto Tests =====%d\n",isss);
 
     RUN_TEST(basic_from_json);
