@@ -222,7 +222,7 @@ struct transform<T, typename std::enable_if<is_reflect_type<T>::value>::type>
             }
             return false;
         }
-        if (json.HasMember(key)) {
+        if (json.IsObject() && json.HasMember(key)) {
             auto&& obj = json[key];
             if (obj.IsObject()) {
                 auto && dest = *reinterpret_cast<Type*>(static_cast<char*>(pThis) + offset);
@@ -266,7 +266,7 @@ struct transform<std::vector<T>>
             }
             return true;
         }
-        if (json.HasMember(key)) {
+        if (json.IsObject() && json.HasMember(key)) {
             auto&& datas = json[key];
             if (datas.IsArray() && datas.Size() > 0) {
                 auto && dest = *reinterpret_cast<Type*>(static_cast<char*>(pThis) + offset);
@@ -332,7 +332,7 @@ struct transform<T, typename std::enable_if<std::is_integral<T>::value || std::i
             return true;
         }
         auto && dest = *reinterpret_cast<Type*>(static_cast<char*>(pThis) + offset);
-        if (json.HasMember(key)) {
+        if (json.IsObject() && json.HasMember(key)) {
             dest = adapter<T,Encoding,Allocator>::get(json[key]);
             return  true;
         }
