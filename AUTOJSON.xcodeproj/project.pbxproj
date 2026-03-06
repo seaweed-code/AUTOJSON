@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		9439645B2F5B14CE00544350 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9439645A2F5B14CE00544350 /* main.cpp */; };
+		94AF27A72F5B9A0800A19BBE /* main__2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 94AF27A62F5B9A0800A19BBE /* main__2.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -23,7 +23,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		9439645A2F5B14CE00544350 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		94AF27A62F5B9A0800A19BBE /* main__2.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main__2.cpp; sourceTree = "<group>"; };
 		94EEFAC52F2DF928002F1790 /* AUTOJSON */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = AUTOJSON; sourceTree = BUILT_PRODUCTS_DIR; };
 		94EEFACF2F2E4D17002F1790 /* JsonTransformAuto.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = JsonTransformAuto.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -59,7 +59,7 @@
 			isa = PBXGroup;
 			children = (
 				94EEFACF2F2E4D17002F1790 /* JsonTransformAuto.h */,
-				9439645A2F5B14CE00544350 /* main.cpp */,
+				94AF27A62F5B9A0800A19BBE /* main__2.cpp */,
 			);
 			path = AUTOJSON;
 			sourceTree = "<group>";
@@ -121,7 +121,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9439645B2F5B14CE00544350 /* main.cpp in Sources */,
+				94AF27A72F5B9A0800A19BBE /* main__2.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
