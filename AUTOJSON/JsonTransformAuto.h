@@ -390,6 +390,20 @@ inline bool transform_from_json(void *pThis,const ReflectMapType &reflect_map ,c
     return  false;
 }
 
+template<typename T>
+bool transform_from_json(std::vector<T>& dest, const std::string& json)
+{
+    rapidjson::Document doc;
+    doc.Parse(json.c_str());
+    if (doc.HasParseError() || !doc.IsArray()) return false;
+
+    dest.resize(doc.Size());
+    for (rapidjson::SizeType i = 0; i < doc.Size(); i++) {
+        transform<T>::from_json(nullptr, doc, &dest[i], i);
+    }
+    return true;
+}
+
 inline void transform_to_json(void *pThis,rapidjson::Value &value,rapidjson::Document::AllocatorType &allocator,const ReflectMapType &reflect_map)
 {
     for (auto&& p:reflect_map)
@@ -410,6 +424,26 @@ inline std::string transform_to_json(void *pThis,const ReflectMapType &reflect_m
     return  buffer.GetString();
 }
 
+
+template<typename T>
+std::string transform_to_json(const std::vector<T>& src)
+{
+    rapidjson::Document doc;
+    doc.SetArray();
+    auto& allocator = doc.GetAllocator();
+    for (size_t i = 0; i < src.size(); i++) {
+        rapidjson::Value e;
+        if (is_reflect_type<T>::value)      e.SetObject();
+        else if (is_vector_type<T>::value)  e.SetArray();
+        transform<T>::to_json(nullptr, e, allocator,
+            const_cast<void*>(static_cast<const void*>(&src[i])), 0);
+        doc.PushBack(e, allocator);
+    }
+    rapidjson::StringBuffer buf;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(buf);
+    doc.Accept(writer);
+    return buf.GetString();
+}
 };
 
 
