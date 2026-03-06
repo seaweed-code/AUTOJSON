@@ -5,14 +5,14 @@
 
 支持：
 
-- `double`    `float`   ` bool`   `int ` `unsigned int`  `int64_t`   `uint64_t` `std::string`
+- `double`    `float`   ` bool`   `int8_t`   `uint8_t` `int16_t`   `uint16_t` `int32_t`   `uint32_t` `int64_t`   `uint64_t` `std::string`
 - `std::vector< T >` ，T 可以是上面的基础类型，或者自定义对象。
 - 支持对象嵌套
 - `std::vector< std::vector<T> >` 数组嵌套数组
 
 不支持：
 
-- `std::vector<bool>` 因为C++模版库对`std::vector<bool> `进行了特化，需要通过其他手动避免使用该特化模版。
+- `std::vector<bool>` 因为C++模版库对`std::vector<bool> `进行了特化，需要通过其他手动避免使用该特化模版。请使用`std::vector<int8_t>` 代替。
 
 ```c++
 // 基础类型结构体
