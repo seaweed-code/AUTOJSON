@@ -268,7 +268,7 @@ struct transform<std::vector<T>>
         }
         if (json.IsObject() && json.HasMember(key)) {
             auto&& datas = json[key];
-            if (datas.IsArray() && datas.Size() > 0) {
+            if (datas.IsArray()) {
                 auto && dest = *reinterpret_cast<Type*>(static_cast<char*>(pThis) + offset);
                 dest.resize(datas.Size());
                 for (int i = 0; i < datas.Size(); i++) {
