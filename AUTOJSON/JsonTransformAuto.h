@@ -384,7 +384,10 @@ inline bool transform_from_json(void *pThis,const ReflectMapType &reflect_map ,c
         return  false;
     }
     rapidjson::Value& root = doc;
-    return transform_from_json(pThis, reflect_map, root);
+    if (root.IsObject()) {
+        return transform_from_json(pThis, reflect_map, root);
+    }
+    return  false;
 }
 
 inline void transform_to_json(void *pThis,rapidjson::Value &value,rapidjson::Document::AllocatorType &allocator,const ReflectMapType &reflect_map)
