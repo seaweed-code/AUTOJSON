@@ -105,6 +105,23 @@ template <typename  T,typename Encoding, typename Allocator>
 struct  adapter;
 
 template <typename Encoding, typename Allocator>
+struct  adapter<uint8_t,Encoding,Allocator>
+{
+    using Type = uint8_t;
+    inline static Type get(const rapidjson::GenericValue<Encoding,Allocator>&value) { return get_number<Type>(value);}
+    inline static void set(rapidjson::GenericValue<Encoding,Allocator>&value,Type newValue,Allocator&){value.SetInt(newValue);}
+};
+
+
+template <typename Encoding, typename Allocator>
+struct  adapter<int8_t,Encoding,Allocator>
+{
+    using Type = int8_t;
+    inline static Type get(const rapidjson::GenericValue<Encoding,Allocator>&value) { return get_number<Type>(value);}
+    inline static void set(rapidjson::GenericValue<Encoding,Allocator>&value,Type newValue,Allocator&){value.SetInt(newValue);}
+};
+
+template <typename Encoding, typename Allocator>
 struct  adapter<int,Encoding,Allocator>
 {
     using Type = int;
