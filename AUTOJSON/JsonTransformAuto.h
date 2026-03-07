@@ -74,7 +74,7 @@ struct  is_vector_type<std::vector<T>> :std::true_type {};
 
 
 template<typename T, typename Encoding, typename Allocator>
-inline T get_number(const rapidjson::GenericValue<Encoding, Allocator>& value) {
+inline T get_number(const rapidjson::GenericValue<Encoding, Allocator>& value) noexcept{
     if (value.IsInt64())   return static_cast<T>(value.GetInt64());
     if (value.IsUint64())  return static_cast<T>(value.GetUint64());
     if (value.IsDouble())  return static_cast<T>(value.GetDouble());
