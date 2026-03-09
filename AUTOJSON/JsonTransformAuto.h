@@ -101,8 +101,17 @@ inline T get_number(const rapidjson::GenericValue<Encoding, Allocator>& value) n
     return T{};
 }
 
-template <typename  T,typename Encoding, typename Allocator>
+template <typename  T,typename Encoding, typename Allocator,typename Enable = void>
 struct  adapter;
+
+template <typename T,typename Encoding, typename Allocator>
+struct  adapter<T,Encoding,Allocator,typename std::enable_if<std::is_enum<T>::value>::type>
+{
+    using Type = T;
+    using UType =   typename std::underlying_type<T>::type;
+    inline static Type get(const rapidjson::GenericValue<Encoding,Allocator>&value) { return static_cast<Type>(get_number<UType>(value));}
+    inline static void set(rapidjson::GenericValue<Encoding,Allocator>&value,Type newValue,Allocator&){value.SetInt(static_cast<UType>(newValue));}
+};
 
 template <typename Encoding, typename Allocator>
 struct  adapter<uint8_t,Encoding,Allocator>
@@ -316,48 +325,9 @@ struct transform<std::vector<T>>
         value.AddMember(k, elements, allocator);
     }
 };
-template <typename  T>
-struct transform<T, typename std::enable_if<std::is_enum<T>::value>::type>
-{
-    using Type = T;
-    using Encoding = typename JsonLocation::EncodingType;
-    using Allocator = typename JsonLocation::AllocatorType;
-    using UType =   typename std::underlying_type<T>::type;
-    
-    static  bool from_json(const char*key,const JsonLocation &json,void*pThis,OffsetType offset)
-    {
-        if (key == nullptr) {///array
-            auto && dest = *reinterpret_cast<Type*>(pThis);
-            dest = static_cast<Type>(adapter<UType,Encoding,Allocator>::get(json[static_cast<int>(offset)]));
-            return true;
-        }
-        auto && dest = *reinterpret_cast<Type*>(static_cast<char*>(pThis) + offset);
-        if (json.IsObject() && json.HasMember(key)) {
-            dest = static_cast<Type>(adapter<UType,Encoding,Allocator>::get(json[key]));
-            return  true;
-        }
-        return false;
-    }
-    
-    static  void to_json(const char*key,rapidjson::Value &value,rapidjson::Document::AllocatorType &allocator,void*pThis,OffsetType offset)
-    {
-        if (key == nullptr) {///array
-            auto && dest = *reinterpret_cast<Type*>(pThis);
-            adapter<UType,Encoding,Allocator>::set(value,static_cast<UType>(dest),allocator);
-            return;
-        }
 
-        auto && dest = *reinterpret_cast<Type*>(static_cast<char*>(pThis) +  offset);
-        rapidjson::Value k;
-        k.SetString(key, allocator);
-
-        rapidjson::Value v;
-        adapter<UType,Encoding,Allocator>::set(v,static_cast<UType>(dest),allocator);
-        value.AddMember(k, v, allocator);
-    }
-};
 template <typename  T>
-struct transform<T, typename std::enable_if<std::is_integral<T>::value || std::is_floating_point<T>::value || std::is_same<T,std::string>::value>::type>
+struct transform<T, typename std::enable_if<std::is_integral<T>::value || std::is_floating_point<T>::value || std::is_same<T,std::string>::value || std::is_enum<T>::value>::type>
 {
     using Type = T;
     using Encoding = typename JsonLocation::EncodingType;
