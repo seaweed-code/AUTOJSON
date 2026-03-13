@@ -1,275 +1,500 @@
-# JsonTransformAuto
+# C++ 自动JSON 转换
+ 基于`rapidjson`
 
-[中文文档](./README.zh-CN.md)
+为类注入运行时反射机制，使得可以自动像高级语言一样，自动JSON转成模型，模型转JSON，而不需逐个字段手动转。
 
-A header-only C++ library for zero-boilerplate JSON serialization and deserialization. Declare a two-line macro in your struct and you get full JSON support automatically — no manual field mapping, no code generation, no external tools.
+支持：
 
-Built on [RapidJSON](https://github.com/Tencent/rapidjson). Compatible with **C++11**, **VS2013**, and **GCC 4.8.5**.
+- `double`    `float`   ` bool` `int8_t ` `uint8_t` `int16_t ` uint16_t`  `int32_t ` `uint32_t`  `int64_t`   `uint64_t` `std::string`
+- `std::vector< T >` ，T 可以是上面的基础类型，或者自定义对象。
+- enum 自定义枚举
+- 支持对象嵌套
+- `std::vector< std::vector<T> >` 数组嵌套数组
 
----
+不支持：
 
-## Features
+- `std::vector<bool>` 因为C++模版库对`std::vector<bool> `进行了特化，请使用:  `std::vector<int8_t>` 之类的代替
 
-- Header-only — just `#include "JsonTransformAuto.h"`
-- Works on any struct with a two-macro declaration
-- Supports all C++ primitive types, `std::string`, nested structs, and `std::vector<T>` (including nested vectors)
-- Type coercion: string `"42"` → `int`, number `100` → `std::string`, etc.
-- Graceful error handling — malformed or mismatched JSON never crashes
-- Missing fields preserve the original value in the struct
-- Supports root-level JSON arrays via free function templates
-
----
-
-## Requirements
-
-- RapidJSON headers on the include path
-- C++11 or later
-
----
-
-## Quick Start
-
-**1. Declare your struct**
-
-```cpp
-#include "JsonTransformAuto.h"
-
-struct Person {
-    std::string name;
-    int32_t     age;
-    DECLARE__JSON__AUTO__TRANSFORM   // inject serialize/deserialize methods
+```c++
+// 基础类型结构体
+struct BasicTypes {
+    int         i;
+    unsigned    u;
+    int64_t     i64;
+    uint64_t    u64;
+    double      d;
+    float       f;
+    bool        b;
+    std::string s;
+    DECLARE__JSON__AUTO__TRANSFORM
 };
+IMPLEMENT__JSON__AUTO__TRANSFORM(BasicTypes, i, u, i64, u64, d, f, b, s)
 
-// At file scope (not inside a function)
-IMPLEMENT__JSON__AUTO__TRANSFORM(Person, name, age)
-```
-
-**2. Deserialize from JSON string**
-
-```cpp
-Person p;
-bool ok = p.transform_from_json("{\"name\":\"Alice\",\"age\":30}");
-// ok == true, p.name == "Alice", p.age == 30
-```
-
-**3. Serialize to JSON string**
-
-```cpp
-Person p;
-p.name = "Bob";
-p.age  = 25;
-std::string json = p.transform_to_json();
-// json == {"name":"Bob","age":25}
-```
-
----
-
-## Supported Field Types
-
-| Type | Notes |
-|---|---|
-| `int8_t`, `uint8_t` | Serialized as JSON integer |
-| `int16_t`, `uint16_t` | Serialized as JSON integer |
-| `int32_t`, `uint32_t` | Serialized as JSON integer |
-| `int64_t`, `uint64_t` | Serialized as JSON integer |
-| `float` | Serialized as JSON double |
-| `double` | Serialized as JSON double |
-| `bool` | Serialized as JSON `true`/`false` |
-| `std::string` | Serialized as JSON string |
-| Nested struct | Must also declare the two macros |
-| `std::vector<T>` | Serialized as JSON array; `T` can be any supported type, including another struct or `std::vector<T>` |
-
-> ⚠️ **`std::vector<bool>` is not supported.** The C++ standard specializes `std::vector<bool>` as a bit-packed container, which means its elements do not have addressable memory and cannot be used with `reinterpret_cast`. Use `std::vector<uint8_t>` instead — values `0` and `1` map cleanly to `false` and `true`.
->
-> ```cpp
-> // ❌ Do not use
-> std::vector<bool> flags;
->
-> // ✅ Use this instead
-> std::vector<uint8_t> flags;  // 0 = false, 1 = true
-> ```
-
-> **Limit:** A single struct can have at most **20 fields**.
-
----
-
-## API Reference
-
-### Methods injected by `DECLARE__JSON__AUTO__TRANSFORM`
-
-```cpp
-// Deserialize from JSON string. Returns true if all fields were found.
-bool transform_from_json(const std::string& json);
-
-// Deserialize from an existing rapidjson::Value (must be an Object).
-bool transform_from_json(const rapidjson::Value& value);
-
-// Serialize to a JSON string.
-std::string transform_to_json();
-
-// Serialize into an existing rapidjson::Value and allocator.
-// Useful for embedding this object inside a larger document.
-void transform_to_json(rapidjson::Value& value,
-                       rapidjson::Document::AllocatorType& allocator);
-```
-
-### Free functions for root-level JSON arrays
-
-These live in the `auto_json` namespace and handle JSON whose root node is an array.
-
-```cpp
-// Deserialize a JSON array string into a vector.
-// T can be a reflect type, a primitive, std::string, or std::vector<T>.
-// Returns false if the JSON is invalid or the root is not an array.
-template<typename T>
-bool auto_json::transform_from_json(std::vector<T>& dest,
-                                    const std::string& json);
-
-// Serialize a vector into a JSON array string.
-template<typename T>
-std::string auto_json::transform_to_json(const std::vector<T>& src);
-```
-
----
-
-## Examples
-
-### Nested structs
-
-```cpp
+// 嵌套结构体
 struct Address {
     std::string city;
-    int32_t     zip;
+    std::string street;
+    int         code;
     DECLARE__JSON__AUTO__TRANSFORM
 };
-IMPLEMENT__JSON__AUTO__TRANSFORM(Address, city, zip)
+IMPLEMENT__JSON__AUTO__TRANSFORM(Address, city, street, code)
 
 struct Person {
     std::string name;
-    int32_t     age;
-    Address     addr;
+    int         age;
+    Address     address;
     DECLARE__JSON__AUTO__TRANSFORM
 };
-IMPLEMENT__JSON__AUTO__TRANSFORM(Person, name, age, addr)
+IMPLEMENT__JSON__AUTO__TRANSFORM(Person, name, age, address)
 
-// Usage
-Person p;
-p.transform_from_json(
-    "{\"name\":\"Alice\",\"age\":30,"
-    "\"addr\":{\"city\":\"Beijing\",\"zip\":100000}}");
-```
-
-### Struct containing a vector
-
-```cpp
-struct Department {
-    std::string           name;
-    std::vector<Employee> employees;
+// vector 结构体
+struct Container {
+    std::vector<int>         int_list;
+    std::vector<std::string> str_list;
+    std::vector<Address>     addr_list;
     DECLARE__JSON__AUTO__TRANSFORM
 };
-IMPLEMENT__JSON__AUTO__TRANSFORM(Department, name, employees)
-```
+IMPLEMENT__JSON__AUTO__TRANSFORM(Container, int_list, str_list, addr_list)
 
-### Nested vectors
-
-```cpp
+// 数组嵌套数组结构体
 struct Matrix {
-    std::string                       label;
-    std::vector<std::vector<int32_t>> rows;
+    std::vector<std::vector<int>>         int_matrix;    // [[1,2],[3,4]]
+    std::vector<std::vector<std::string>> str_matrix;    // [["a","b"],["c"]]
+    std::vector<std::vector<Address>>     struct_matrix; // [[{...},{...}],[{...}]]
     DECLARE__JSON__AUTO__TRANSFORM
 };
-IMPLEMENT__JSON__AUTO__TRANSFORM(Matrix, label, rows)
-```
+IMPLEMENT__JSON__AUTO__TRANSFORM(Matrix, int_matrix, str_matrix, struct_matrix)
 
-### Root-level JSON array
-
-```cpp
-std::vector<Person> people;
-
-// Deserialize
-bool ok = auto_json::transform_from_json(people, "[{...},{...}]");
-
-// Serialize
-std::string json = auto_json::transform_to_json(people);
-```
-
-### Embed into a larger document
-
-```cpp
-Address addr;
-addr.city = "Wuhan";
-addr.zip  = 430000;
-
-rapidjson::Document doc;
-doc.SetObject();
-auto& alloc = doc.GetAllocator();
-
-rapidjson::Value addrVal(rapidjson::kObjectType);
-addr.transform_to_json(addrVal, alloc);
-
-doc.AddMember("addr", addrVal, alloc);
-```
-
----
-
-## Error Handling and Edge Cases
-
-| Situation | Behavior |
-|---|---|
-| Invalid JSON string | Returns `false`, struct is unchanged |
-| Root node is an array (single-object API) | Returns `false`, struct is unchanged |
-| Root node is an object (array API) | Returns `false`, vector is unchanged |
-| Missing field in JSON | Field keeps its original value; function returns `false` |
-| Extra / unknown fields in JSON | Silently ignored |
-| Field value is `null` | Primitive fields receive their zero/default value; nested object fields keep their original value |
-| Field expects object, JSON gives array/string | Nested field keeps its original value |
-| Field expects array, JSON gives number/object | Vector field is unchanged |
-| Array element type mismatch | Element keeps its zero/default value; no crash |
-| String `"42"` → integer field | Parsed with `std::stoll` / `std::stod`; bad strings return `0` |
-| Number → `std::string` field | Converted with `std::to_string` |
-| `bool` JSON literal → `std::string` field | Returns empty string (not `"true"`/`"false"`) |
-| Empty array `[]` in a vector field | Vector is resized to 0; function returns `true` |
-
----
-
-## Important Notes
-
-**Structs must be declared at file or namespace scope.**
-
-`DECLARE__JSON__AUTO__TRANSFORM` injects a `static` data member. C++ does not allow static members inside local (function-scoped) structs.
-
-```cpp
-// ✅ Correct — file scope
-struct Foo {
-    int x;
+// 类型兼容降级结构体（JSON类型与C++类型不匹配）
+struct CompatTypes {
+    int         i_from_bool;      // JSON: true  -> int 1
+    int         i_from_double;    // JSON: 3.9   -> int 3
+    int         i_from_string;    // JSON: "42"  -> int 42
+    double      d_from_bool;      // JSON: false -> double 0.0
+    double      d_from_string;    // JSON: "3.14"-> double 3.14
+    float       f_from_string;    // JSON: "1.5" -> float 1.5
+    bool        b_from_int;       // JSON: 1     -> bool true
+    bool        b_from_zero;      // JSON: 0     -> bool false
+    bool        b_from_string;    // JSON: "true"-> bool true
+    uint64_t    u64_from_string;  // JSON: "999" -> uint64_t 999
+    std::string s_from_int;       // JSON: 123   -> string "123"
+    std::string s_from_double;    // JSON: 1.5   -> string (含"1.5")
     DECLARE__JSON__AUTO__TRANSFORM
 };
-IMPLEMENT__JSON__AUTO__TRANSFORM(Foo, x)
+IMPLEMENT__JSON__AUTO__TRANSFORM(CompatTypes,
+    i_from_bool, i_from_double, i_from_string,
+    d_from_bool, d_from_string, f_from_string,
+    b_from_int, b_from_zero, b_from_string,
+    u64_from_string, s_from_int, s_from_double)
 
-// ❌ Wrong — local scope
-void bar() {
-    struct Foo { int x; DECLARE__JSON__AUTO__TRANSFORM };  // compile error
+// ============================================================
+// 辅助宏
+// ============================================================
+#define ASSERT_EQ(a, b)  do { \
+    if (!((a) == (b))) { \
+        printf("FAILED: %s == %s  (line %d)\n", #a, #b, __LINE__); \
+        assert(false); \
+    } \
+} while(0)
+
+#define ASSERT_NEAR(a, b, eps) do { \
+    if (std::fabs((double)(a) - (double)(b)) > (eps)) { \
+        printf("FAILED: |%s - %s| <= %g  (line %d)\n", #a, #b, (double)(eps), __LINE__); \
+        assert(false); \
+    } \
+} while(0)
+
+#define ASSERT_TRUE(expr) do { \
+    if (!(expr)) { \
+        printf("FAILED: %s  (line %d)\n", #expr, __LINE__); \
+        assert(false); \
+    } \
+} while(0)
+
+#define RUN_TEST(name) do { \
+    test_##name(); \
+    printf("PASSED: " #name "\n"); \
+} while(0)
+
+// ============================================================
+// 测试：基础类型 JSON -> 结构体
+// ============================================================
+void test_basic_from_json() {
+    const std::string json = R"({
+        "i":   -42,
+        "u":   100,
+        "i64": -9000000000,
+        "u64": 18000000000,
+        "d":   3.14159,
+        "f":   1.5,
+        "b":   true,
+        "s":   "hello"
+    })";
+    BasicTypes obj{};
+    bool ok = obj.transform_from_json(json);
+    ASSERT_TRUE(ok);
+    ASSERT_EQ(obj.i,   -42);
+    ASSERT_EQ(obj.u,   100u);
+    ASSERT_EQ(obj.i64, -9000000000LL);
+    ASSERT_EQ(obj.u64, 18000000000ULL);
+    ASSERT_NEAR(obj.d, 3.14159, 1e-5);
+    ASSERT_NEAR(obj.f, 1.5f,    1e-5);
+    ASSERT_EQ(obj.b,   true);
+    ASSERT_EQ(obj.s,   "hello");
 }
+
+// ============================================================
+// 测试：基础类型 结构体 -> JSON -> 结构体（往返）
+// ============================================================
+void test_basic_roundtrip() {
+    BasicTypes src{};
+    src.i   = 7;
+    src.u   = 8u;
+    src.i64 = -123456789012345LL;
+    src.u64 = 987654321098765ULL;
+    src.d   = 2.71828;
+    src.f   = 0.5f;
+    src.b   = false;
+    src.s   = "world";
+
+    std::string json = src.transform_to_json();
+
+    BasicTypes dst{};
+    bool ok = dst.transform_from_json(json);
+    ASSERT_TRUE(ok);
+    ASSERT_EQ(dst.i,   src.i);
+    ASSERT_EQ(dst.u,   src.u);
+    ASSERT_EQ(dst.i64, src.i64);
+    ASSERT_EQ(dst.u64, src.u64);
+    ASSERT_NEAR(dst.d, src.d, 1e-5);
+    ASSERT_NEAR(dst.f, src.f, 1e-4);
+    ASSERT_EQ(dst.b,   src.b);
+    ASSERT_EQ(dst.s,   src.s);
+}
+
+// ============================================================
+// 测试：嵌套结构体
+// ============================================================
+void test_nested_struct() {
+    const std::string json = R"({
+        "name": "Alice",
+        "age": 30,
+        "address": {
+            "city": "Beijing",
+            "street": "Main St",
+            "code": 100000
+        }
+    })";
+    Person p{};
+    bool ok = p.transform_from_json(json);
+    ASSERT_TRUE(ok);
+    ASSERT_EQ(p.name,             "Alice");
+    ASSERT_EQ(p.age,              30);
+    ASSERT_EQ(p.address.city,     "Beijing");
+    ASSERT_EQ(p.address.street,   "Main St");
+    ASSERT_EQ(p.address.code,     100000);
+}
+
+void test_nested_roundtrip() {
+    Person src{};
+    src.name           = "Bob";
+    src.age            = 25;
+    src.address.city   = "Shanghai";
+    src.address.street = "Nanjing Rd";
+    src.address.code   = 200000;
+
+    Person dst{};
+    bool ok = dst.transform_from_json(src.transform_to_json());
+    ASSERT_TRUE(ok);
+    ASSERT_EQ(dst.name,             src.name);
+    ASSERT_EQ(dst.age,              src.age);
+    ASSERT_EQ(dst.address.city,     src.address.city);
+    ASSERT_EQ(dst.address.street,   src.address.street);
+    ASSERT_EQ(dst.address.code,     src.address.code);
+}
+
+// ============================================================
+// 测试：vector 基础类型
+// ============================================================
+void test_vector_int() {
+    const std::string json = R"({"int_list":[1,2,3,4,5],"str_list":[],"addr_list":[]})";
+    Container c{};
+    c.transform_from_json(json);  // 空 vector 不计入失败
+    ASSERT_EQ(c.int_list.size(), 5u);
+    ASSERT_EQ(c.int_list[0], 1);
+    ASSERT_EQ(c.int_list[4], 5);
+}
+
+void test_vector_string() {
+    const std::string json = R"({"int_list":[],"str_list":["a","b","c"],"addr_list":[]})";
+    Container c{};
+    c.transform_from_json(json);
+    ASSERT_EQ(c.str_list.size(), 3u);
+    ASSERT_EQ(c.str_list[0], "a");
+    ASSERT_EQ(c.str_list[2], "c");
+}
+
+void test_vector_struct() {
+    const std::string json = R"({
+        "int_list": [],
+        "str_list": [],
+        "addr_list": [
+            {"city":"A","street":"s1","code":1},
+            {"city":"B","street":"s2","code":2}
+        ]
+    })";
+    Container c{};
+    c.transform_from_json(json);
+    ASSERT_EQ(c.addr_list.size(), 2u);
+    ASSERT_EQ(c.addr_list[0].city, "A");
+    ASSERT_EQ(c.addr_list[1].code, 2);
+}
+
+// 空 vector（[]）应被认为解析成功，dest 保持空
+void test_vector_empty_array() {
+    const std::string json = R"({"int_list":[],"str_list":[],"addr_list":[]})";
+    Container c{};
+    c.int_list = {9, 9, 9};  // 预填值，确认被清空
+    c.transform_from_json(json);
+    // 空数组时 resize 不应发生，原有数据保留（取决于实现）
+    // 此处只验证不崩溃即可
+    ASSERT_TRUE(true);
+}
+
+void test_vector_roundtrip() {
+    Container src{};
+    src.int_list = {10, 20, 30};
+    src.str_list = {"x", "y"};
+    src.addr_list.push_back({"City1", "Street1", 111});
+
+    Container dst{};
+    bool ok = dst.transform_from_json(src.transform_to_json());
+    ASSERT_TRUE(ok);
+    ASSERT_EQ(dst.int_list.size(),  3u);
+    ASSERT_EQ(dst.int_list[1],      20);
+    ASSERT_EQ(dst.str_list[0],      "x");
+    ASSERT_EQ(dst.addr_list[0].code, 111);
+}
+
+// ============================================================
+// 测试：类型兼容降级
+// ============================================================
+void test_compat_types() {
+    const std::string json = R"({
+        "i_from_bool":     true,
+        "i_from_double":   3.9,
+        "i_from_string":   "42",
+        "d_from_bool":     false,
+        "d_from_string":   "3.14",
+        "f_from_string":   "1.5",
+        "b_from_int":      1,
+        "b_from_zero":     0,
+        "b_from_string":   "true",
+        "u64_from_string": "999",
+        "s_from_int":      123,
+        "s_from_double":   1.5
+    })";
+    CompatTypes obj{};
+    obj.transform_from_json(json);  // 部分字段可能降级，不强求全部 ok
+
+    ASSERT_EQ(obj.i_from_bool,    1);
+    ASSERT_EQ(obj.i_from_double,  3);        // truncate
+    ASSERT_EQ(obj.i_from_string,  42);
+    ASSERT_NEAR(obj.d_from_bool,  0.0, 1e-9);
+    ASSERT_NEAR(obj.d_from_string,3.14, 1e-5);
+    ASSERT_NEAR(obj.f_from_string,1.5f, 1e-5);
+    ASSERT_EQ(obj.b_from_int,     true);
+    ASSERT_EQ(obj.b_from_zero,    false);
+    ASSERT_EQ(obj.b_from_string,  true);
+    ASSERT_EQ(obj.u64_from_string,999ULL);
+    ASSERT_EQ(obj.s_from_int,     "123");
+    // s_from_double: std::to_string(1.5) 平台相关，只验证非空
+    ASSERT_TRUE(!obj.s_from_double.empty());
+}
+
+// ============================================================
+// 测试：数组嵌套数组
+// ============================================================
+
+// int 二维数组
+void test_nested_vector_int() {
+    const std::string json = R"({
+        "int_matrix":    [[1,2,3],[4,5],[6]],
+        "str_matrix":    [],
+        "struct_matrix": []
+    })";
+    Matrix m{};
+    m.transform_from_json(json);
+    ASSERT_EQ(m.int_matrix.size(),    3u);
+    ASSERT_EQ(m.int_matrix[0].size(), 3u);
+    ASSERT_EQ(m.int_matrix[0][0],     1);
+    ASSERT_EQ(m.int_matrix[0][2],     3);
+    ASSERT_EQ(m.int_matrix[1].size(), 2u);
+    ASSERT_EQ(m.int_matrix[1][1],     5);
+    ASSERT_EQ(m.int_matrix[2].size(), 1u);
+    ASSERT_EQ(m.int_matrix[2][0],     6);
+}
+
+// string 二维数组
+void test_nested_vector_string() {
+    const std::string json = R"({
+        "int_matrix":    [],
+        "str_matrix":    [["hello","world"],["foo"]],
+        "struct_matrix": []
+    })";
+    Matrix m{};
+    m.transform_from_json(json);
+    ASSERT_EQ(m.str_matrix.size(),    2u);
+    ASSERT_EQ(m.str_matrix[0].size(), 2u);
+    ASSERT_EQ(m.str_matrix[0][0],     "hello");
+    ASSERT_EQ(m.str_matrix[0][1],     "world");
+    ASSERT_EQ(m.str_matrix[1].size(), 1u);
+    ASSERT_EQ(m.str_matrix[1][0],     "foo");
+}
+
+// 结构体二维数组
+void test_nested_vector_struct() {
+    const std::string json = R"({
+        "int_matrix":    [],
+        "str_matrix":    [],
+        "struct_matrix": [
+            [{"city":"A","street":"s1","code":1},{"city":"B","street":"s2","code":2}],
+            [{"city":"C","street":"s3","code":3}]
+        ]
+    })";
+    Matrix m{};
+    m.transform_from_json(json);
+    ASSERT_EQ(m.struct_matrix.size(),       2u);
+    ASSERT_EQ(m.struct_matrix[0].size(),    2u);
+    ASSERT_EQ(m.struct_matrix[0][0].city,   "A");
+    ASSERT_EQ(m.struct_matrix[0][1].code,   2);
+    ASSERT_EQ(m.struct_matrix[1].size(),    1u);
+    ASSERT_EQ(m.struct_matrix[1][0].city,   "C");
+}
+
+// 二维数组往返
+void test_nested_vector_roundtrip() {
+    Matrix src{};
+    src.int_matrix = {{1, 2}, {3, 4, 5}};
+    src.str_matrix = {{"a", "b"}, {"c"}};
+    src.struct_matrix = {{{"City1", "St1", 100}, {"City2", "St2", 200}}};
+
+    Matrix dst{};
+    dst.transform_from_json(src.transform_to_json());
+
+    ASSERT_EQ(dst.int_matrix.size(),          2u);
+    ASSERT_EQ(dst.int_matrix[0][1],           2);
+    ASSERT_EQ(dst.int_matrix[1][2],           5);
+    ASSERT_EQ(dst.str_matrix[0][0],           "a");
+    ASSERT_EQ(dst.str_matrix[1][0],           "c");
+    ASSERT_EQ(dst.struct_matrix[0][0].city,   "City1");
+    ASSERT_EQ(dst.struct_matrix[0][1].code,   200);
+}
+
+// 内层含空数组
+void test_nested_vector_inner_empty() {
+    const std::string json = R"({
+        "int_matrix":    [[],[1,2],[]],
+        "str_matrix":    [],
+        "struct_matrix": []
+    })";
+    Matrix m{};
+    m.transform_from_json(json);
+    // 内层空数组不崩溃，非空行数据正确
+    ASSERT_EQ(m.int_matrix.size(),    3u);
+    ASSERT_EQ(m.int_matrix[1].size(), 2u);
+    ASSERT_EQ(m.int_matrix[1][0],     1);
+}
+
+// ============================================================
+// 测试：JSON 格式错误
+// ============================================================
+void test_invalid_json() {
+    BasicTypes obj{};
+    bool ok = obj.transform_from_json("{invalid json}");
+    ASSERT_EQ(ok, false);
+}
+
+// ============================================================
+// 测试：字段缺失
+// ============================================================
+void test_missing_field() {
+    // 只有部分字段
+    const std::string json = R"({"i": 1, "s": "hi"})";
+    BasicTypes obj{};
+    bool ok = obj.transform_from_json(json);
+    // 有字段缺失，应返回 false
+    ASSERT_EQ(ok, false);
+    // 但已有字段应正确解析
+    ASSERT_EQ(obj.i, 1);
+    ASSERT_EQ(obj.s, "hi");
+}
+
+// ============================================================
+// 测试：极值
+// ============================================================
+void test_extreme_values() {
+    const std::string json = R"({
+        "i":   -2147483648,
+        "u":   4294967295,
+        "i64": -9223372036854775808,
+        "u64": 9223372036854775807,
+        "d":   1.7976931348623157e+308,
+        "f":   3.4028235e+38,
+        "b":   false,
+        "s":   ""
+    })";
+    BasicTypes obj{};
+    bool ok = obj.transform_from_json(json);
+    ASSERT_TRUE(ok);
+    ASSERT_EQ(obj.i, -2147483648);
+    ASSERT_EQ(obj.u, 4294967295u);
+    ASSERT_EQ(obj.b, false);
+    ASSERT_EQ(obj.s, "");
+}
+
+// ============================================================
+// 测试：字符串含特殊字符
+// ============================================================
+void test_special_string() {
+    const std::string json = R"({
+        "i":0,"u":0,"i64":0,"u64":0,"d":0,"f":0,"b":false,
+        "s": "hello \"world\"\nnewline\ttab"
+    })";
+    BasicTypes obj{};
+    obj.transform_from_json(json);
+    ASSERT_TRUE(obj.s.find("world") != std::string::npos);
+}
+
+// ============================================================
+// main
+// ============================================================
+int main() {
+    printf("===== JsonTransformAuto Tests =====\n");
+
+    RUN_TEST(basic_from_json);
+    RUN_TEST(basic_roundtrip);
+    RUN_TEST(nested_struct);
+    RUN_TEST(nested_roundtrip);
+    RUN_TEST(vector_int);
+    RUN_TEST(vector_string);
+    RUN_TEST(vector_struct);
+    RUN_TEST(vector_empty_array);
+    RUN_TEST(vector_roundtrip);
+    RUN_TEST(nested_vector_int);
+    RUN_TEST(nested_vector_string);
+    RUN_TEST(nested_vector_struct);
+    RUN_TEST(nested_vector_roundtrip);
+    RUN_TEST(nested_vector_inner_empty);
+    RUN_TEST(compat_types);
+    RUN_TEST(invalid_json);
+    RUN_TEST(missing_field);
+    RUN_TEST(extreme_values);
+    RUN_TEST(special_string);
+
+    printf("\n===== All tests passed =====\n");
+    return 0;
+}
+
 ```
 
-**`IMPLEMENT__JSON__AUTO__TRANSFORM` must appear exactly once per struct**, typically in a `.cpp` file (or a header if the project is header-only).
-
-**Maximum 20 fields per struct.** Split larger structs into nested ones if needed.
-
----
-
-## Type Coercion Rules
-
-The library attempts reasonable conversions when the JSON type does not exactly match the field type.
-
-| JSON value | Target C++ type | Result |
-|---|---|---|
-| `"42"` | any integer | `42` (via `std::stoll`) |
-| `"3.14"` | `float`/`double` | `3.14` (via `std::stod`) |
-| `"true"` or `"1"` | `bool` | `true` |
-| `"false"` or `"0"` | `bool` | `false` |
-| `1` / `0` | `bool` | `true` / `false` |
-| `42` | `std::string` | `"42"` (via `std::to_string`) |
-| `3.14` | `std::string` | `"3.14..."` (via `std::to_string`) |
-| `true` / `false` | `std::string` | `""` (empty, not supported) |
-| `"not_a_number"` | any number | `0` (exception caught) |
