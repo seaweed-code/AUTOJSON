@@ -6,9 +6,9 @@
 支持：
 
 - `double`    `float`   ` bool` `int8_t ` `uint8_t` `int16_t ` uint16_t`  `int32_t ` `uint32_t`  `int64_t`   `uint64_t` `std::string`
-- `std::vector< T >` ，T 可以是上面的基础类型，或者自定义对象。
 - enum 自定义枚举
 - 支持对象嵌套
+- `std::vector< T >` ，T 可以是上面的基础类型，或者自定义对象。
 - `std::vector< std::vector<T> >` 数组嵌套数组
 
 不支持：
