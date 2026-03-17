@@ -110,7 +110,7 @@ struct  adapter<T,Encoding,Allocator,typename std::enable_if<std::is_enum<T>::va
     using Type = T;
     using UType =   typename std::underlying_type<T>::type;
     inline static Type get(const rapidjson::GenericValue<Encoding,Allocator>&value) { return static_cast<Type>(get_number<UType>(value));}
-    inline static void set(rapidjson::GenericValue<Encoding,Allocator>&value,Type newValue,Allocator&){value.SetInt(static_cast<UType>(newValue));}
+    inline static void set(rapidjson::GenericValue<Encoding,Allocator>&value,Type newValue,Allocator&alloc){adapter<UType,Encoding,Allocator>::set(value,static_cast<UType>(newValue),alloc);}
 };
 
 template <typename Encoding, typename Allocator>
